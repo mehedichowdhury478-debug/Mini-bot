@@ -374,8 +374,8 @@
 
 <script>
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "VidUnlock_Core_State_V6";
-const BUCKET_NAME = "Viral Video"; // আপনার Supabase বাকেটের নাম হুবহু এখানে দেওয়া হলো
+const STORE_KEY = "VidUnlock_Core_State_V7";
+const BUCKET_NAME = "Viral Video"; 
 
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -453,7 +453,7 @@ const i18n = {
 };
 
 let state = {
-  version: 6,
+  version: 7,
   lang: 'bn',
   categories: [
     { id: 'cat_all', name: 'সব', icon: '✨', order: 0 },
@@ -745,13 +745,18 @@ function toggleReaction() {
   updateDetailUI(currentActiveVid);
 }
 
+// ঠিক করা হয়েছে: Monetag/Libtl অ্যাড সফলভাবে দেখার পর ট্রিগার নিশ্চিত করা
 async function watchAd() {
   if (isAdShowing) return;
   const v = currentActiveVid;
   const btn = document.getElementById('ad-btn');
 
   if (typeof show_11458857 !== 'function') {
-    showToast("Ad SDK loading...", "warning");
+    showToast("Ad SDK loading or blocked. Try again.", "warning");
+    // যদি কোনো কারণে SDK লোড না হয় বা টেস্টিংয়ের সময় ফলব্যাক হিসেবে সরাসরি আনলক সুবিধা রাখা হলো:
+    if (confirm("অ্যাড লোড হয়নি। সরাসরি আনলক করতে চান?")) {
+      handleAdSuccess(v.id);
+    }
     return;
   }
 
@@ -759,11 +764,12 @@ async function watchAd() {
   if(btn) btn.disabled = true;
 
   try {
+    // Monetag SDK ফাংশন সাধারণত সফলভাবে সমাপ্ত হলে রেজলভ হয় অথবা প্রমিজ রিটার্ন করে
     await show_11458857(); 
     handleAdSuccess(v.id);
   } catch (err) {
-    console.error("Ad failed:", err);
-    showToast("Ad display failed.", "danger");
+    console.error("Ad failed or skipped:", err);
+    showToast("বিজ্ঞাপনটি সম্পূর্ণ দেখা হয়নি অথবা স্কিপ করা হয়েছে।", "danger");
   } finally {
     isAdShowing = false;
     if (btn) btn.disabled = false;
@@ -867,7 +873,7 @@ async function saveVideo() {
 
   } catch (err) {
     console.error("Upload error:", err);
-    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ 'Viral Video' নামের বাকেট পাবলিক করা আছে কিনা চেক করুন।", "danger");
+    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ সঠিক বাকেট পলিসি চেক করুন।", "danger");
   } finally {
     if(uploadBtn) {
       uploadBtn.disabled = false;
