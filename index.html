@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Desi Honey</title>
+  <title>ভাইরাল ভিডিও</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -43,7 +43,7 @@
 
   /* Top User Header Box */
   .top-user-box{margin:16px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
-  .tu-left h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:#fff;background:linear-gradient(135deg,#fff 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .tu-left h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;background:linear-gradient(135deg,#fff 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .tu-right{display:flex;align-items:center;gap:12px}
   .online-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);padding:6px 12px;border-radius:30px;font-size:11px;font-weight:700;color:var(--success)}
   .online-dot{width:7px;height:7px;background:var(--success);border-radius:50%;box-shadow:0 0 8px var(--success)}
@@ -88,7 +88,7 @@
   .card-meta{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}
   .card-tag{background:rgba(236,72,153,0.15);color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:700;font-size:9px;text-transform:uppercase}
 
-  /* Profile View Design (As in Screenshot) */
+  /* Profile View Design */
   .profile-container{padding-top:10px}
   .profile-identity-card{background:#fff;color:#0b0e14;border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
   .profile-avatar-box{width:84px;height:84px;border-radius:50%;background:var(--gradient-btn);margin:0 auto 12px;padding:3px;box-shadow:0 8px 25px var(--primary-glow)}
@@ -110,7 +110,7 @@
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* Bottom Navigation Bar (Matched with Screenshots) */
+  /* Bottom Navigation Bar (Matched with active color toggle) */
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 5px calc(10px + env(safe-area-inset-bottom));z-index:150}
   .nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:11px;font-weight:600;flex:1;background:none;border:none;cursor:pointer;font-family:inherit;transition:0.2s}
   .nav-btn.active{color:var(--primary)}
@@ -184,12 +184,12 @@
 <!-- Top User & Channel Header Box -->
 <div class="top-user-box">
   <div class="tu-left">
-    <h1>Desi Honey</h1>
+    <h1>ভাইরাল ভিডিও</h1>
   </div>
   <div class="tu-right">
     <div class="online-badge">
       <span class="online-dot"></span>
-      <span id="online-count">8</span> ONLINE
+      <span id="online-count">14</span> ONLINE
     </div>
     <div class="welcome-wrap">
       <div class="welcome-lbl">WELCOME</div>
@@ -208,7 +208,7 @@
   </div>
 </div>
 
-<!-- Category Filter Pills -->
+<!-- Category Filter Pills (Only 'All' + admin added categories) -->
 <div class="cat-scroll" id="category-tabs"></div>
 
 <!-- HOME VIEW -->
@@ -314,9 +314,9 @@
 
   <div class="admin-subview hidden" id="admin-sub-cats">
     <div class="admin-panel-card">
-      <h4>➕ ক্যাটাগরি তৈরি</h4>
-      <div class="form-group"><label>নাম (বাংলা/English)</label><input id="ac-name" type="text"/></div>
-      <button class="btn btn-primary" onclick="saveCategory()">সেভ ক্যাটাগরি</button>
+      <h4>➕ নতুন ক্যাটাগরি তৈরি করুন</h4>
+      <div class="form-group"><label>ক্যাটাগরির নাম</label><input id="ac-name" placeholder="যেমন: TIKTOK VIRAL" type="text"/></div>
+      <button class="btn btn-primary" onclick="saveCategory()">ক্যাটাগরি সেভ করুন</button>
     </div>
     <div id="admin-cat-list"></div>
   </div>
@@ -358,7 +358,7 @@
   </div>
 </div>
 
-<!-- BOTTOM NAVIGATION BAR (Exact 4 main tabs as requested) -->
+<!-- BOTTOM NAVIGATION BAR (Fixed with proper active color toggle) -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home')"><i>🏠</i><span>হোম</span></button>
   <button class="nav-btn" onclick="showView('fav')"><i>❤️</i><span>পছন্দ</span></button>
@@ -372,7 +372,7 @@
 
 <script>
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "DesiHoney_App_V1";
+const STORE_KEY = "ViralVideo_App_V2";
 const BUCKET_NAME = "Viral Video"; 
 
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
@@ -385,9 +385,7 @@ try {
 
 let state = {
   categories: [
-    { id: 'cat_all', name: 'All 43' },
-    { id: 'cat_others', name: 'Others 1' },
-    { id: 'cat_tiktok', name: 'TIKTOK VIRAL 8' }
+    { id: 'cat_all', name: 'All' }
   ],
   videos: [],
   viralLinks: [
@@ -439,7 +437,13 @@ async function initApp() {
       const { data: vids } = await supabaseClient.from('videos').select('*');
       if (vids && vids.length) state.videos = vids;
       const { data: cats } = await supabaseClient.from('categories').select('*');
-      if (cats && cats.length > 0) state.categories = cats;
+      if (cats && cats.length > 0) {
+        // Ensure 'cat_all' is always present
+        if (!cats.some(c => c.id === 'cat_all')) {
+          cats.unshift({ id: 'cat_all', name: 'All' });
+        }
+        state.categories = cats;
+      }
       const { data: viral } = await supabaseClient.from('viral_links').select('*');
       if (viral && viral.length) state.viralLinks = viral;
     } catch (e) {}
@@ -493,7 +497,8 @@ function renderCategories() {
 
   const sel = document.getElementById('av-cat');
   if(sel) {
-    sel.innerHTML = state.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    // Only show selectable categories except 'cat_all' if uploading specific video category, or include all
+    sel.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `<option value="${c.id}">${c.name}</option>`).join('');
   }
 }
 
@@ -503,12 +508,12 @@ function createCard(v) {
   const views = v.views ? Object.keys(v.views).length : 135;
   const cat = state.categories.find(c => c.id === v.category_id);
   const catName = cat ? cat.name : 'VIRAL VIDEO';
-  const thumb = v.thumb || 'https://via.placeholder.com/320x240?text=Desi+Honey';
+  const thumb = v.thumb || 'https://via.placeholder.com/320x240?text=Viral+Video';
 
   return `
     <div class="video-card" onclick="openDetail('${v.id}')">
       <div class="thumb-wrap">
-        <img src="${thumb}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x240?text=Desi+Honey'"/>
+        <img src="${thumb}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x240?text=Viral+Video'"/>
         <div class="status-badge ${isUnlocked ? 'badge-unlock' : 'badge-lock'}">
           ${isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}
         </div>
@@ -546,14 +551,6 @@ function renderHome() {
     vids = vids.filter(v => v.title.toLowerCase().includes(q));
   }
   
-  // Demo items if empty to match screenshot visual
-  if (!vids.length && currentCat === 'cat_all' && !q) {
-    vids = [
-      { id: 'demo_1', title: 'ছোট ভাইকে চুড়তে দিলো বড়ো আপু', category_id: 'cat_all', thumb: '', required_ads: 1 },
-      { id: 'demo_2', title: 'গার্লফ্রেন্ড কে চুদছে 🤤🍑', category_id: 'cat_all', thumb: '', required_ads: 1 }
-    ];
-  }
-
   grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>📹</i>কোনো ভিডিও পাওয়া যায়নি</div>';
 }
 
@@ -598,10 +595,7 @@ function openExternal(url) {
 
 async function openDetail(id) {
   let v = state.videos.find(x => x.id === id);
-  if (!v) {
-    // Fallback demo video for testing click
-    v = { id, title: 'প্রিমিয়াম ভাইরাল ভিডিও কনটেন্ট', link: '', thumb: '', required_ads: 1, views: { [user.id]: 135 } };
-  }
+  if (!v) return;
   currentActiveVid = v;
 
   if (!v.views) v.views = {};
@@ -763,7 +757,7 @@ async function deleteVideo(id) {
 
 async function saveCategory() {
   const name = document.getElementById('ac-name').value.trim();
-  if (!name) return showToast("নাম দিন");
+  if (!name) return showToast("ক্যাটাগরির নাম দিন");
 
   const newCat = { id: 'cat_' + Date.now(), name };
   if (supabaseClient) {
@@ -772,7 +766,24 @@ async function saveCategory() {
   state.categories.push(newCat);
   saveState();
   renderCategories();
+  renderAdminCategories();
   showToast("ক্যাটাগরি সেভ হয়েছে!", "success");
+  document.getElementById('ac-name').value = '';
+}
+
+async function deleteCategory(id) {
+  if (id === 'cat_all') return showToast("All ক্যাটাগরি ডিলিট করা যাবে না!", "danger");
+  showCustomConfirm("ডিলিট", "ক্যাটাগরি মুছে ফেলতে চান?", async () => {
+    if (supabaseClient) {
+      try { await supabaseClient.from('categories').delete().eq('id', id); } catch(e){}
+    }
+    state.categories = state.categories.filter(c => c.id !== id);
+    if (currentCat === id) currentCat = 'cat_all';
+    saveState();
+    renderCategories();
+    renderAll();
+    showToast("ক্যাটাগরি ডিলিট হয়েছে!", "success");
+  });
 }
 
 async function saveViralLink() {
@@ -807,6 +818,7 @@ async function deleteViralLink(id) {
 
 function renderAdmin() {
   if (Number(user.id) !== ADMIN_ID) return;
+  
   document.getElementById('admin-vid-list').innerHTML = state.videos.map(v => `
     <div class="admin-list-row">
       <div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(v.title)}</div>
@@ -819,6 +831,19 @@ function renderAdmin() {
     <div class="admin-list-row">
       <div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(l.title)}</div>
       <button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteViralLink('${l.id}')">ডিলিট</button>
+    </div>
+  `).join('');
+
+  renderAdminCategories();
+}
+
+function renderAdminCategories() {
+  const catListDiv = document.getElementById('admin-cat-list');
+  if(!catListDiv) return;
+  catListDiv.innerHTML = state.categories.map(c => `
+    <div class="admin-list-row">
+      <div style="font-size:12px;font-weight:700;">${escapeHtml(c.name)}</div>
+      ${c.id !== 'cat_all' ? `<button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteCategory('${c.id}')">ডিলিট</button>` : `<span style="font-size:11px;color:var(--muted)">Default</span>`}
     </div>
   `).join('');
 }
