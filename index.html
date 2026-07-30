@@ -375,7 +375,7 @@
 <script>
 const ADMIN_ID = 6377295796;
 const STORE_KEY = "VidUnlock_Core_State_V6";
-const BUCKET_NAME = "viral video"; // আপনার Supabase Bucket নাম
+const BUCKET_NAME = "Viralvideo"; // হুবহু আপনার বাকেট নাম (Viralvideo)
 
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -826,7 +826,7 @@ async function saveVideo() {
     const fileName = `video_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${videoFile.name.split('.').pop()}`;
 
     if (supabaseClient) {
-      // BUCKET_NAME ব্যবহার করা হচ্ছে
+      // হুবহু BUCKET_NAME ('Viralvideo') ব্যবহার করা হচ্ছে
       const { error: uploadError } = await supabaseClient.storage
         .from(BUCKET_NAME)
         .upload(fileName, videoFile);
@@ -868,7 +868,7 @@ async function saveVideo() {
 
   } catch (err) {
     console.error("Upload error:", err);
-    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ viral video নামের বাকেট পাবলিক আছে কিনা দেখুন।", "danger");
+    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ Viralvideo নামের বাকেট পাবলিক করা আছে কিনা চেক করুন।", "danger");
   } finally {
     if(uploadBtn) {
       uploadBtn.disabled = false;
@@ -1136,4 +1136,4 @@ function shareVideo() {
 window.onload = initApp;
 </script>
 </body>
-  </html>
+</html>
