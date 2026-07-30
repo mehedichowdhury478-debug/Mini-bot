@@ -149,7 +149,7 @@
   .admin-list-thumb{width:40px;height:40px;border-radius:8px;object-fit:cover;background:#000}
 
   /* NAV */
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,13,23,0.95);backdrop-filter:blur(15px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 5px calc(10px + env(safe-area-inset-bottom));z-index:150}
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,13,23,0.95);backdrop-filter:blur(15px);border-top:1px solid var(--border);display:flex;justify-around:space-around;padding:10px 5px calc(10px + env(safe-area-inset-bottom));z-index:150}
   .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:11px;font-weight:600;flex:1;background:none;border:none;cursor:pointer;font-family:inherit}
   .nav-item.active{color:var(--primary)}
   .nav-item i{font-size:18px;font-style:normal}
@@ -375,6 +375,7 @@
 <script>
 const ADMIN_ID = 6377295796;
 const STORE_KEY = "VidUnlock_Core_State_V6";
+const BUCKET_NAME = "viral video"; // আপনার Supabase Bucket নাম
 
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -714,7 +715,8 @@ async function updateDetailUI(v) {
       actionArea.innerHTML = `
         <div class="admin-card" style="text-align:center;background:rgba(34,197,138,0.1)">
           <h3 style="color:var(--success);margin-bottom:10px">🔓 ভিডিও আনলকড!</h3>
-          <p style="font-size:12px;color:var(--muted)">উপরের প্লেয়ারে ভিডিও প্লে করুন।</p>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:12px">উপরের প্লেয়ারে ভিডিও প্লে করুন অথবা সরাসরি ডাউনলোড করুন।</p>
+          <a href="${v.link}" target="_blank" download class="btn btn-s" style="text-decoration:none;display:inline-flex;">📥 ভিডিও ডাউনলোড করুন</a>
         </div>`;
     } else {
       actionArea.innerHTML = `
@@ -824,14 +826,15 @@ async function saveVideo() {
     const fileName = `video_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${videoFile.name.split('.').pop()}`;
 
     if (supabaseClient) {
+      // BUCKET_NAME ব্যবহার করা হচ্ছে
       const { error: uploadError } = await supabaseClient.storage
-        .from('videos')
+        .from(BUCKET_NAME)
         .upload(fileName, videoFile);
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabaseClient.storage
-        .from('videos')
+        .from(BUCKET_NAME)
         .getPublicUrl(fileName);
 
       const videoPublicUrl = publicUrlData.publicUrl;
@@ -865,7 +868,7 @@ async function saveVideo() {
 
   } catch (err) {
     console.error("Upload error:", err);
-    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage bucket পলিসি বা সাইজ চেক করুন।", "danger");
+    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ viral video নামের বাকেট পাবলিক আছে কিনা দেখুন।", "danger");
   } finally {
     if(uploadBtn) {
       uploadBtn.disabled = false;
@@ -1133,4 +1136,4 @@ function shareVideo() {
 window.onload = initApp;
 </script>
 </body>
-                                                  </html>
+  </html>
