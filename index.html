@@ -110,10 +110,10 @@
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* Bottom Navigation Bar (Matched with active color toggle) */
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 5px calc(10px + env(safe-area-inset-bottom));z-index:150}
-  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:11px;font-weight:600;flex:1;background:none;border:none;cursor:pointer;font-family:inherit;transition:0.2s}
-  .nav-btn.active{color:var(--primary)}
+  /* Bottom Navigation Bar (Updated: Normal state black/dark muted, Active state highlighted with primary color/gradient background & text) */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:150}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;color:#525a66;font-size:11px;font-weight:600;flex:1;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:0.2s;padding:6px 0;border-radius:14px}
+  .nav-btn.active{color:#fff;background:var(--gradient-btn);box-shadow:0 4px 15px var(--primary-glow)}
   .nav-btn i{font-size:18px;font-style:normal}
 
   /* Modals */
@@ -358,7 +358,7 @@
   </div>
 </div>
 
-<!-- BOTTOM NAVIGATION BAR (Fixed with proper active color toggle) -->
+<!-- BOTTOM NAVIGATION BAR -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home')"><i>🏠</i><span>হোম</span></button>
   <button class="nav-btn" onclick="showView('fav')"><i>❤️</i><span>পছন্দ</span></button>
@@ -438,7 +438,6 @@ async function initApp() {
       if (vids && vids.length) state.videos = vids;
       const { data: cats } = await supabaseClient.from('categories').select('*');
       if (cats && cats.length > 0) {
-        // Ensure 'cat_all' is always present
         if (!cats.some(c => c.id === 'cat_all')) {
           cats.unshift({ id: 'cat_all', name: 'All' });
         }
@@ -497,7 +496,6 @@ function renderCategories() {
 
   const sel = document.getElementById('av-cat');
   if(sel) {
-    // Only show selectable categories except 'cat_all' if uploading specific video category, or include all
     sel.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `<option value="${c.id}">${c.name}</option>`).join('');
   }
 }
