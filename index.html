@@ -45,11 +45,9 @@
   .top-user-box{margin:16px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
   .tu-left h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;background:linear-gradient(135deg,#fff 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .tu-right{display:flex;align-items:center;gap:12px}
-  .online-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);padding:6px 12px;border-radius:30px;font-size:11px;font-weight:700;color:var(--success)}
-  .online-dot{width:7px;height:7px;background:var(--success);border-radius:50%;box-shadow:0 0 8px var(--success)}
   .welcome-wrap{text-align:right}
-  .welcome-lbl{font-size:10px;text-transform:uppercase;color:var(--muted);letter-spacing:0.5px}
-  .welcome-name{font-size:12px;font-weight:700;color:#fff}
+  .welcome-name{font-size:13px;font-weight:700;color:#fff}
+  .welcome-id{font-size:11px;color:var(--muted)}
   .tu-avatar{width:40px;height:40px;border-radius:50%;background:var(--gradient-btn);display:grid;place-items:center;font-size:15px;font-weight:800;overflow:hidden;box-shadow:0 4px 15px var(--primary-glow)}
   .tu-avatar img{width:100%;height:100%;object-fit:cover}
 
@@ -181,19 +179,15 @@
   </div>
 </div>
 
-<!-- Top User & Channel Header Box -->
+<!-- Top User & Header Box -->
 <div class="top-user-box">
   <div class="tu-left">
     <h1>ভাইরাল ভিডিও</h1>
   </div>
   <div class="tu-right">
-    <div class="online-badge">
-      <span class="online-dot"></span>
-      <span id="online-count">14</span> ONLINE
-    </div>
     <div class="welcome-wrap">
-      <div class="welcome-lbl">WELCOME</div>
       <div class="welcome-name" id="top-user-name">ইউজার</div>
+      <div class="welcome-id" id="top-user-id">ID: 0000</div>
     </div>
     <div class="tu-avatar" id="top-avatar-container">UV</div>
   </div>
@@ -222,9 +216,9 @@
   <div class="video-grid" id="fav-grid"></div>
 </section>
 
-<!-- TUTORIAL / UNLOCKED VIEW (টিউটোরিয়াল) -->
+<!-- UNLOCKED VIEW -->
 <section class="view" id="view-tutorial">
-  <h3 class="section-title">📖 টিউটোরিয়াল / আনলক করা ভিডিও</h3>
+  <h3 class="section-title">🔓 আনলক করা ভিডিও</h3>
   <div class="video-grid" id="tutorial-grid"></div>
 </section>
 
@@ -358,11 +352,10 @@
   </div>
 </div>
 
-<!-- BOTTOM NAVIGATION BAR -->
+<!-- BOTTOM NAVIGATION BAR (টিউটোরিয়াল বাটন বাদ দেওয়া হয়েছে) -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home')"><i>🏠</i><span>হোম</span></button>
   <button class="nav-btn" onclick="showView('fav')"><i>❤️</i><span>পছন্দ</span></button>
-  <button class="nav-btn" onclick="showView('tutorial')"><i>📖</i><span>টিউটোরিয়াল</span></button>
   <button class="nav-btn" onclick="showView('links')"><i>🔗</i><span>লিংক</span></button>
   <button class="nav-btn hidden" id="nav-profile" onclick="showView('profile')"><i>👤</i><span>প্রোফাইল</span></button>
   <button class="nav-btn hidden" id="nav-admin" onclick="showView('admin')"><i>🛠</i><span>অ্যাডমিন</span></button>
@@ -371,7 +364,7 @@
 <div id="toast-box"></div>
 
 <script>
-const ADMIN_ID = 6377295796; // আপনার দেওয়া নির্দিষ্ট অ্যাডমিন আইডি
+const ADMIN_ID = 6377295796; 
 const STORE_KEY = "ViralVideo_App_V3";
 const BUCKET_NAME = "Viral Video"; 
 
@@ -399,8 +392,7 @@ let state = {
 };
 
 let tg = window.Telegram.WebApp || {};
-// টেলিগ্রাম থেকে ইউজারের ডাটা ডাইনামিক্যালি ফেচ করা
-let user = tg.initDataUnsafe?.user || { id: 6377295796, first_name: 'Admin User', username: 'admin', photo_url: '' };
+let user = tg.initDataUnsafe?.user || { id: 6377295796, first_name: 'Md Janina', username: 'admin', photo_url: '' };
 let currentCat = 'cat_all';
 let isAdShowing = false;
 let currentActiveVid = null;
@@ -449,7 +441,6 @@ async function initApp() {
     } catch (e) {}
   }
 
-  // অ্যাডমিন আইডি চেক করে মেনু দৃশ্যমান করা
   if (Number(user.id) === ADMIN_ID) {
     document.getElementById('nav-admin').classList.remove('hidden');
   }
@@ -468,12 +459,14 @@ function saveState() {
 }
 
 function renderProfileUI() {
-  const name = user.first_name || 'User';
-  const uname = user.username ? '@' + user.username : '@user';
+  // পুরো নাম এবং ইউজার আইডি প্রদর্শন (WELCOME বা অনলাইন স্ট্যাটাস বাদ দিয়ে)
+  const fullName = user.last_name ? `${user.first_name} ${user.last_name}` : (user.first_name || 'Md Janina');
+  const uname = user.username ? '@' + user.username : '@username';
   const uid = user.id || '00000000';
 
-  document.getElementById('top-user-name').textContent = name;
-  document.getElementById('prof-name').textContent = name;
+  document.getElementById('top-user-name').textContent = fullName;
+  document.getElementById('top-user-id').textContent = `ID: ${uid}`;
+  document.getElementById('prof-name').textContent = fullName;
   document.getElementById('prof-username').textContent = uname;
   document.getElementById('prof-id').textContent = uid;
 
@@ -483,7 +476,7 @@ function renderProfileUI() {
     if (user.photo_url) {
       box.innerHTML = `<img src="${user.photo_url}" alt="Profile Photo"/>`;
     } else {
-      const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
       box.innerHTML = `<div class="fallback-avatar">${initials}</div>`;
     }
   });
@@ -564,7 +557,7 @@ function renderFavs() {
 function renderTutorial() {
   const grid = document.getElementById('tutorial-grid');
   const vids = state.videos.filter(v => state.unlocked[v.id]);
-  grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>📖</i>কোনো টিউটোরিয়াল বা আনলক করা ভিডিও নেই</div>';
+  grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>🔓</i>কোনো আনলক করা ভিডিও নেই</div>';
 }
 
 function renderViralLinks() {
@@ -862,7 +855,8 @@ function showView(id) {
   
   const navs = document.querySelectorAll('.nav-btn');
   navs.forEach(n => n.classList.remove('active'));
-  const map = { 'home':0, 'fav':1, 'tutorial':2, 'links':3, 'profile':4, 'admin':5 };
+  // মেনু বাটনগুলোর সঠিক ইন্ডেক্স ম্যাপ (টিউটোরিয়াল বাদ দেওয়ায় আপডেট করা হয়েছে)
+  const map = { 'home':0, 'fav':1, 'links':2, 'profile':3, 'admin':4 };
   if(map[id] !== undefined && navs[map[id]]) navs[map[id]].classList.add('active');
 }
 
