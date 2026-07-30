@@ -47,6 +47,7 @@
   .tu-avatar{width:40px;height:40px;border-radius:50%;background:var(--gradient-btn);display:grid;place-items:center;font-size:15px;font-weight:800;overflow:hidden;box-shadow:0 4px 15px var(--primary-glow)}
   .tu-avatar img{width:100%;height:100%;object-fit:cover}
 
+  /* Search - শুধু হোমে */
   .search-wrap{padding:0 16px 16px}
   .search-box{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius)}
   .search-box:focus-within{border-color:var(--primary);box-shadow:0 0 15px var(--primary-glow)}
@@ -79,31 +80,30 @@
   .card-meta{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}
   .card-tag{background:rgba(236,72,153,0.15);color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:700;font-size:9px;text-transform:uppercase}
 
-  /* Empty State - বড় ও মাঝখানে */
+  /* ========== Empty State - সুন্দর ও পুরোপুরি মাঝখানে ========== */
   .empty-state{
-    text-align:center;
-    padding:80px 20px 40px;
-    color:var(--muted);
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    min-height:280px;
+    text-align:center;
+    min-height:340px;
+    padding:40px 20px;
   }
-  .empty-state i{
-    font-size:64px;
-    display:block;
-    margin-bottom:16px;
+  .empty-state .empty-icon{
+    font-size:72px;
     line-height:1;
+    margin-bottom:18px;
+    opacity:0.9;
   }
-  .empty-state p{
+  .empty-state .empty-text{
     font-size:16px;
     font-weight:600;
     color:var(--muted);
-    margin:0;
+    line-height:1.4;
   }
 
-  /* Profile - ডার্ক থিমের সাথে মানানসই */
+  /* Profile */
   .profile-container{padding-top:10px}
   .profile-identity-card{
     background:var(--surface);
@@ -161,7 +161,7 @@
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* Bottom Navigation - সব ধূসর, ক্লিক করলে গোলাপি */
+  /* Bottom Navigation */
   .bottom-nav{
     position:fixed;
     bottom:0;
@@ -189,15 +189,25 @@
     border:none !important;
     cursor:pointer;
     font-family:inherit;
-    transition:color 0.2s ease;
+    transition:all 0.2s ease;
     padding:6px 0;
     box-shadow:none !important;
     outline:none;
+    position:relative;
   }
   .nav-btn.active{
     color:#ec4899 !important;
-    background:transparent !important;
-    box-shadow:none !important;
+  }
+  .nav-btn.active::after{
+    content:'';
+    position:absolute;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:20px;
+    height:3px;
+    background:var(--primary);
+    border-radius:3px;
   }
   .nav-btn i,
   .nav-btn span{
@@ -281,7 +291,8 @@
   </div>
 </div>
 
-<div class="search-wrap">
+<!-- Search শুধু হোমে -->
+<div class="search-wrap" id="search-wrap">
   <div class="search-box">
     <span>🔍</span>
     <input id="main-search" oninput="handleSearch()" placeholder="ভিডিও খুঁজুন..." type="text"/>
@@ -289,7 +300,7 @@
   </div>
 </div>
 
-<!-- ক্যাটাগরি শুধু হোমে দেখাবে -->
+<!-- ক্যাটাগরি শুধু হোমে -->
 <div class="cat-scroll" id="category-tabs"></div>
 
 <section class="view active" id="view-home">
@@ -503,8 +514,7 @@ async function initApp() {
     renderProfileUI();
     renderCategories();
     renderAll();
-    // প্রথমে হোম ভিউতে ক্যাটাগরি দেখাও
-    toggleCategoryTabs('home');
+    toggleHomeOnlyElements('home');
   } catch(e) {
     console.log('Init error', e);
   } finally {
@@ -594,7 +604,11 @@ function renderHome() {
   if (vids.length) {
     grid.innerHTML = vids.map(createCard).join('');
   } else {
-    grid.innerHTML = '<div class="empty-state"><i>📹</i><p>কোনো ভিডিও পাওয়া যায়নি</p></div>';
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📹</div>
+        <div class="empty-text">কোনো ভিডিও<br>পাওয়া যায়নি</div>
+      </div>`;
   }
 }
 
@@ -606,7 +620,11 @@ function renderFavs() {
   if (vids.length) {
     grid.innerHTML = vids.map(createCard).join('');
   } else {
-    grid.innerHTML = '<div class="empty-state"><i>❤️</i><p>পছন্দের ভিডিও নেই</p></div>';
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">❤️</div>
+        <div class="empty-text">পছন্দের ভিডিও<br>নেই</div>
+      </div>`;
   }
 }
 
@@ -618,7 +636,11 @@ function renderTutorial() {
   if (vids.length) {
     grid.innerHTML = vids.map(createCard).join('');
   } else {
-    grid.innerHTML = '<div class="empty-state"><i>🔓</i><p>কোনো আনলক করা ভিডিও নেই</p></div>';
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔓</div>
+        <div class="empty-text">কোনো আনলক করা<br>ভিডিও নেই</div>
+      </div>`;
   }
 }
 
@@ -627,7 +649,11 @@ function renderViralLinks() {
   if (!cont) return;
   const links = state.viralLinks || [];
   if (!links.length) {
-    cont.innerHTML = '<div class="empty-state"><i>🔗</i><p>কোনো লিংক নেই</p></div>';
+    cont.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-text">কোনো লিংক নেই</div>
+      </div>`;
     return;
   }
   cont.innerHTML = links.map(l => 
@@ -874,14 +900,17 @@ function switchAdminSub(subId, btn) {
   }
 }
 
-/* ক্যাটাগরি শুধু হোমে দেখাবে */
-function toggleCategoryTabs(viewId) {
+/* Search + Category শুধু হোমে দেখাবে */
+function toggleHomeOnlyElements(viewId) {
+  const searchWrap = document.getElementById('search-wrap');
   const catTabs = document.getElementById('category-tabs');
-  if (!catTabs) return;
+  
   if (viewId === 'home') {
-    catTabs.classList.remove('hidden');
+    if (searchWrap) searchWrap.classList.remove('hidden');
+    if (catTabs) catTabs.classList.remove('hidden');
   } else {
-    catTabs.classList.add('hidden');
+    if (searchWrap) searchWrap.classList.add('hidden');
+    if (catTabs) catTabs.classList.add('hidden');
   }
 }
 
@@ -890,8 +919,8 @@ function showView(id) {
   const view = document.getElementById('view-' + id);
   if (view) view.classList.add('active');
 
-  // ক্যাটাগরি শুধু হোমে
-  toggleCategoryTabs(id);
+  // Search ও Category শুধু হোমে
+  toggleHomeOnlyElements(id);
 
   // সব বাটন থেকে active সরানো
   document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
