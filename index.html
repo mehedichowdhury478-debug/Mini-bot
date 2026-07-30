@@ -5,16 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>ভাইরাল ভিডিও</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 
-  <!-- Telegram Mini App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- Monetag / Libtl Advertisement SDK -->
   <script data-sdk="show_11458857" data-zone="11458857" src="//libtl.com/sdk.js"></script>
-  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -37,13 +33,13 @@
   html,body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
   body{padding-bottom:100px}
 
-  #app-loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+  #app-loader{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity 0.3s}
+  #app-loader.hide{opacity:0;pointer-events:none}
   .spinner{width:44px;height:44px;border:3px solid var(--surface-light);border-top:3px solid var(--primary);border-radius:50%;animation:spin 0.8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* Top User Header Box */
   .top-user-box{margin:16px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 10px 25px rgba(0,0,0,0.3)}
-  .tu-left h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;background:linear-gradient(135deg,#fff 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .tu-left h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#fff 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
   .tu-right{display:flex;align-items:center;gap:12px}
   .welcome-wrap{text-align:right}
   .welcome-name{font-size:13px;font-weight:700;color:#fff}
@@ -51,17 +47,15 @@
   .tu-avatar{width:40px;height:40px;border-radius:50%;background:var(--gradient-btn);display:grid;place-items:center;font-size:15px;font-weight:800;overflow:hidden;box-shadow:0 4px 15px var(--primary-glow)}
   .tu-avatar img{width:100%;height:100%;object-fit:cover}
 
-  /* Search Box */
   .search-wrap{padding:0 16px 16px}
-  .search-box{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius);transition:0.3s}
+  .search-box{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius)}
   .search-box:focus-within{border-color:var(--primary);box-shadow:0 0 15px var(--primary-glow)}
   .search-box input{background:none;border:none;color:#fff;font-size:14px;width:100%;outline:none;font-family:inherit}
-  .search-box button{background:var(--gradient-btn);border:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff;cursor:pointer;flex-shrink:0;box-shadow:0 4px 12px var(--primary-glow)}
+  .search-box button{background:var(--gradient-btn);border:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff;cursor:pointer;flex-shrink:0}
 
-  /* Category Scroll Pills */
   .cat-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 16px;scrollbar-width:none}
   .cat-scroll::-webkit-scrollbar{display:none}
-  .cat-pill{padding:8px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--muted);transition:0.2s}
+  .cat-pill{padding:8px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--muted)}
   .cat-pill.active{background:var(--gradient-btn);border-color:transparent;color:#fff;box-shadow:0 4px 15px var(--primary-glow)}
 
   .view{display:none;padding:0 16px}
@@ -70,9 +64,8 @@
 
   .section-title{font-size:17px;font-weight:800;margin:10px 0 14px;display:flex;align-items:center;gap:8px;color:var(--primary)}
 
-  /* Video Grid */
   .video-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:12px}
-  .video-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;cursor:pointer;transition:0.2s}
+  .video-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative;cursor:pointer}
   .video-card:active{transform:scale(0.97)}
   .thumb-wrap{aspect-ratio:4/3;position:relative;background:#000}
   .thumb-wrap img{width:100%;height:100%;object-fit:cover}
@@ -86,7 +79,6 @@
   .card-meta{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}
   .card-tag{background:rgba(236,72,153,0.15);color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:700;font-size:9px;text-transform:uppercase}
 
-  /* Profile View Design */
   .profile-container{padding-top:10px}
   .profile-identity-card{background:#fff;color:#0b0e14;border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
   .profile-avatar-box{width:84px;height:84px;border-radius:50%;background:var(--gradient-btn);margin:0 auto 12px;padding:3px;box-shadow:0 8px 25px var(--primary-glow)}
@@ -96,25 +88,23 @@
   .profile-id-pill{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 14px;border-radius:30px;font-size:12px;font-weight:700;color:#0b0e14}
 
   .profile-menu-list{background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-bottom:20px}
-  .profile-menu-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:0.2s}
+  .profile-menu-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer}
   .profile-menu-item:last-child{border-bottom:none}
   .profile-menu-item:active{background:var(--surface-light)}
   .menu-item-left{display:flex;align-items:center;gap:14px;font-size:14px;font-weight:700;color:#fff}
 
-  /* Viral Link Box */
   .viral-link-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .v-info{display:flex;align-items:center;gap:14px;overflow:hidden}
   .v-icon{width:44px;height:44px;border-radius:14px;background:var(--surface-light);display:grid;place-items:center;font-size:20px;flex-shrink:0;color:var(--primary)}
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* Bottom Navigation Bar */
+  /* Bottom Nav - 2nd image style */
   .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:150}
-  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;color:#525a66;font-size:11px;font-weight:600;flex:1;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:0.2s;padding:6px 0;border-radius:14px}
-  .nav-btn.active{color:#fff;background:var(--gradient-btn);box-shadow:0 4px 15px var(--primary-glow)}
-  .nav-btn i{font-size:18px;font-style:normal}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6b7280;font-size:11px;font-weight:600;flex:1;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:color 0.2s;padding:6px 0}
+  .nav-btn.active{color:var(--primary);background:transparent}
+  .nav-btn i{font-size:20px;font-style:normal;line-height:1}
 
-  /* Modals */
   .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:none;align-items:flex-end}
   .modal-overlay.open{display:flex}
   .modal-sheet{background:var(--bg);width:100%;max-height:92vh;border-radius:32px 32px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:slideUp 0.3s cubic-bezier(0,0,0.2,1);border-top:1px solid var(--border)}
@@ -129,7 +119,7 @@
   .confirm-card p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.4}
   .confirm-btns{display:flex;gap:10px}
 
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px;border-radius:14px;font-weight:700;font-size:14px;width:100%;border:none;color:#fff;cursor:pointer;font-family:inherit;transition:0.2s}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:12px 20px;border-radius:14px;font-weight:700;font-size:14px;width:100%;border:none;color:#fff;cursor:pointer;font-family:inherit}
   .btn:active{transform:scale(0.96)}
   .btn-primary{background:var(--gradient-btn);box-shadow:0 8px 20px var(--primary-glow)}
   .btn-success{background:var(--success)}
@@ -164,10 +154,9 @@
 
 <div id="app-loader">
   <div class="spinner"></div>
-  <p style="font-size:13px; color:var(--muted); font-weight:600;">লোড হচ্ছে...</p>
+  <p style="font-size:13px;color:var(--muted);font-weight:600">লোড হচ্ছে...</p>
 </div>
 
-<!-- Custom Confirmation Modal -->
 <div class="custom-confirm" id="custom-confirm-modal">
   <div class="confirm-card">
     <h3 id="cc-title">নিশ্চিত করুন</h3>
@@ -179,11 +168,8 @@
   </div>
 </div>
 
-<!-- Top User & Header Box -->
 <div class="top-user-box">
-  <div class="tu-left">
-    <h1>ভাইরাল ভিডিও</h1>
-  </div>
+  <div class="tu-left"><h1>ভাইরাল ভিডিও</h1></div>
   <div class="tu-right">
     <div class="welcome-wrap">
       <div class="welcome-name" id="top-user-name">ইউজার</div>
@@ -193,7 +179,6 @@
   </div>
 </div>
 
-<!-- Search Box -->
 <div class="search-wrap">
   <div class="search-box">
     <span>🔍</span>
@@ -202,87 +187,52 @@
   </div>
 </div>
 
-<!-- Category Filter Pills -->
 <div class="cat-scroll" id="category-tabs"></div>
 
-<!-- HOME VIEW -->
 <section class="view active" id="view-home">
   <div class="video-grid" id="main-grid"></div>
 </section>
 
-<!-- FAVORITES VIEW (পছন্দ) -->
 <section class="view" id="view-fav">
   <h3 class="section-title">❤️ পছন্দের ভিডিও</h3>
   <div class="video-grid" id="fav-grid"></div>
 </section>
 
-<!-- UNLOCKED VIEW -->
 <section class="view" id="view-tutorial">
   <h3 class="section-title">🔓 আনলক করা ভিডিও</h3>
   <div class="video-grid" id="tutorial-grid"></div>
 </section>
 
-<!-- LINKS VIEW (লিংক) -->
 <section class="view" id="view-links">
   <h3 class="section-title">🔗 প্রয়োজনীয় লিংক</h3>
   <div id="viral-links-container"></div>
 </section>
 
-<!-- PROFILE VIEW (প্রোফাইল) -->
 <section class="view" id="view-profile">
   <div class="profile-container">
     <div class="profile-identity-card">
       <div class="profile-avatar-box" id="profile-avatar-container"></div>
       <div class="profile-name" id="prof-name">ইউজার</div>
       <div class="profile-username" id="prof-username">@username</div>
-      <div class="profile-id-pill">
-        <span>🆔 ID:</span> <span id="prof-id">00000000</span>
-      </div>
+      <div class="profile-id-pill"><span>🆔 ID:</span> <span id="prof-id">00000000</span></div>
     </div>
-
     <div class="profile-menu-list">
-      <div class="profile-menu-item" onclick="showView('fav')">
-        <div class="menu-item-left">
-          <span>❤️</span>
-          <span>Favorites</span>
-        </div>
-        <span>›</span>
-      </div>
-      <div class="profile-menu-item" onclick="showView('tutorial')">
-        <div class="menu-item-left">
-          <span>🔓</span>
-          <span>Unlocked Videos</span>
-        </div>
-        <span>›</span>
-      </div>
-      <div class="profile-menu-item" onclick="exportData()">
-        <div class="menu-item-left">
-          <span>📥</span>
-          <span>Backup Download</span>
-        </div>
-        <span>›</span>
-      </div>
-      <div class="profile-menu-item" onclick="triggerImport()">
-        <div class="menu-item-left">
-          <span>📤</span>
-          <span>Backup Restore (Import)</span>
-        </div>
-        <span>›</span>
-      </div>
+      <div class="profile-menu-item" onclick="showView('fav')"><div class="menu-item-left"><span>❤️</span><span>Favorites</span></div><span>›</span></div>
+      <div class="profile-menu-item" onclick="showView('tutorial')"><div class="menu-item-left"><span>🔓</span><span>Unlocked Videos</span></div><span>›</span></div>
+      <div class="profile-menu-item" onclick="exportData()"><div class="menu-item-left"><span>📥</span><span>Backup Download</span></div><span>›</span></div>
+      <div class="profile-menu-item" onclick="triggerImport()"><div class="menu-item-left"><span>📤</span><span>Backup Restore (Import)</span></div><span>›</span></div>
     </div>
   </div>
 </section>
 <input type="file" id="import-file-input" style="display:none" accept=".json" onchange="importData(event)"/>
 
-<!-- ADMIN VIEW -->
 <section class="view" id="view-admin">
   <h3 class="section-title">🛠 অ্যাডমিন ড্যাশবোর্ড</h3>
-  <div class="cat-scroll" style="padding:0; margin-bottom:16px">
-    <button class="cat-pill active" onclick="switchAdminSub('vids', this)">ভিডিও আপলোড</button>
-    <button class="cat-pill" onclick="switchAdminSub('viral', this)">ভাইরাল লিংক</button>
-    <button class="cat-pill" onclick="switchAdminSub('cats', this)">ক্যাটাগরি</button>
+  <div class="cat-scroll" style="padding:0;margin-bottom:16px">
+    <button class="cat-pill active" onclick="switchAdminSub('vids',this)">ভিডিও আপলোড</button>
+    <button class="cat-pill" onclick="switchAdminSub('viral',this)">ভাইরাল লিংক</button>
+    <button class="cat-pill" onclick="switchAdminSub('cats',this)">ক্যাটাগরি</button>
   </div>
-
   <div class="admin-subview" id="admin-sub-vids">
     <div class="admin-panel-card">
       <h4>➕ নতুন ভিডিও আপলোড</h4>
@@ -295,7 +245,6 @@
     </div>
     <div id="admin-vid-list"></div>
   </div>
-
   <div class="admin-subview hidden" id="admin-sub-viral">
     <div class="admin-panel-card">
       <h4>➕ প্রয়োজনীয় লিংক যোগ করুন</h4>
@@ -305,7 +254,6 @@
     </div>
     <div id="admin-viral-list"></div>
   </div>
-
   <div class="admin-subview hidden" id="admin-sub-cats">
     <div class="admin-panel-card">
       <h4>➕ নতুন ক্যাটাগরি তৈরি করুন</h4>
@@ -316,7 +264,6 @@
   </div>
 </section>
 
-<!-- VIDEO DETAIL MODAL -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal-sheet">
     <div class="sheet-top">
@@ -334,9 +281,7 @@
         <span class="status-badge badge-unlock" id="md-badge" style="position:static;padding:3px 10px;font-size:11px">Premium</span>
         <span id="md-views" style="font-size:12px;color:var(--muted)">0 Views</span>
       </div>
-      
       <div id="md-action-area"></div>
-
       <div class="comments-container">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <h4 style="font-size:14px">💬 কমেন্টস</h4>
@@ -352,7 +297,6 @@
   </div>
 </div>
 
-<!-- BOTTOM NAVIGATION BAR (টিউটোরিয়াল বাটন বাদ দেওয়া হয়েছে) -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home')"><i>🏠</i><span>হোম</span></button>
   <button class="nav-btn" onclick="showView('fav')"><i>❤️</i><span>পছন্দ</span></button>
@@ -364,26 +308,36 @@
 <div id="toast-box"></div>
 
 <script>
-const ADMIN_ID = 6377295796; 
-const STORE_KEY = "ViralVideo_App_V3";
-const BUCKET_NAME = "Viral Video"; 
+// ========== লোডার জোর করে হাইড ==========
+function hideLoader() {
+  const loader = document.getElementById('app-loader');
+  if (loader) {
+    loader.classList.add('hide');
+    setTimeout(() => { loader.style.display = 'none'; }, 300);
+  }
+}
 
+// ১ সেকেন্ডের মধ্যে লোডার হাইড (সেফটি)
+setTimeout(hideLoader, 1000);
+
+// ========== মূল ভেরিয়েবল ==========
+const ADMIN_ID = 6377295796;
+const STORE_KEY = "ViralVideo_App_V3";
+const BUCKET_NAME = "Viral Video";
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
 
-let supabaseClient;
+let supabaseClient = null;
 try {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-} catch (e) {}
+  if (window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e) {}
 
 let state = {
-  categories: [
-    { id: 'cat_all', name: 'All' }
-  ],
+  categories: [{ id: 'cat_all', name: 'All' }],
   videos: [],
-  viralLinks: [
-    { id: 'vl_1', title: 'ভাইরাল ভিডিও লিংক', url: 'https://t.me/...' }
-  ],
+  viralLinks: [{ id: 'vl_1', title: 'ভাইরাল ভিডিও লিংক', url: 'https://t.me/...' }],
   unlocked: {},
   progress: {},
   favorites: {},
@@ -391,108 +345,113 @@ let state = {
   comments: {}
 };
 
-let tg = window.Telegram.WebApp || {};
-let user = tg.initDataUnsafe?.user || { id: 6377295796, first_name: 'Md Janina', username: 'admin', photo_url: '' };
+let tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : {};
+let user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : { id: 6377295796, first_name: 'Md Janina', username: 'admin', photo_url: '' };
 let currentCat = 'cat_all';
 let isAdShowing = false;
 let currentActiveVid = null;
+
+function withTimeout(p, ms) {
+  return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+}
 
 function showCustomConfirm(title, message, onConfirm) {
   const modal = document.getElementById('custom-confirm-modal');
   document.getElementById('cc-title').textContent = title;
   document.getElementById('cc-message').textContent = message;
   modal.classList.add('open');
-
   const okBtn = document.getElementById('cc-ok');
   const cancelBtn = document.getElementById('cc-cancel');
-
-  const cleanup = () => {
-    modal.classList.remove('open');
-    okBtn.onclick = null;
-    cancelBtn.onclick = null;
-  };
-
+  const cleanup = () => { modal.classList.remove('open'); okBtn.onclick = null; cancelBtn.onclick = null; };
   okBtn.onclick = () => { cleanup(); onConfirm(); };
   cancelBtn.onclick = () => { cleanup(); };
 }
 
 async function initApp() {
-  if (tg.ready) tg.ready();
-  if (tg.expand) tg.expand();
-  
-  const saved = localStorage.getItem(STORE_KEY);
-  if (saved) {
-    try { state = { ...state, ...JSON.parse(saved) }; } catch(e) {}
-  }
+  try {
+    if (tg.ready) tg.ready();
+    if (tg.expand) tg.expand();
 
-  if (supabaseClient) {
+    // লোকাল স্টোরেজ
     try {
-      const { data: vids } = await supabaseClient.from('videos').select('*');
-      if (vids && vids.length) state.videos = vids;
-      const { data: cats } = await supabaseClient.from('categories').select('*');
-      if (cats && cats.length > 0) {
-        if (!cats.some(c => c.id === 'cat_all')) {
-          cats.unshift({ id: 'cat_all', name: 'All' });
+      const saved = localStorage.getItem(STORE_KEY);
+      if (saved) state = { ...state, ...JSON.parse(saved) };
+    } catch(e) {}
+
+    // Supabase (ব্যাকগ্রাউন্ডে, এরর হলে স্কিপ)
+    if (supabaseClient) {
+      try {
+        const [v, c, l] = await Promise.allSettled([
+          withTimeout(supabaseClient.from('videos').select('*'), 3000),
+          withTimeout(supabaseClient.from('categories').select('*'), 3000),
+          withTimeout(supabaseClient.from('viral_links').select('*'), 3000)
+        ]);
+        if (v.status === 'fulfilled' && v.value && v.value.data && v.value.data.length) state.videos = v.value.data;
+        if (c.status === 'fulfilled' && c.value && c.value.data && c.value.data.length) {
+          let cats = c.value.data;
+          if (!cats.some(x => x.id === 'cat_all')) cats.unshift({ id: 'cat_all', name: 'All' });
+          state.categories = cats;
         }
-        state.categories = cats;
-      }
-      const { data: viral } = await supabaseClient.from('viral_links').select('*');
-      if (viral && viral.length) state.viralLinks = viral;
-    } catch (e) {}
-  }
+        if (l.status === 'fulfilled' && l.value && l.value.data && l.value.data.length) state.viralLinks = l.value.data;
+      } catch(e) {}
+    }
 
-  if (Number(user.id) === ADMIN_ID) {
-    document.getElementById('nav-admin').classList.remove('hidden');
-  }
-  document.getElementById('nav-profile').classList.remove('hidden');
+    if (Number(user.id) === ADMIN_ID) {
+      const el = document.getElementById('nav-admin');
+      if (el) el.classList.remove('hidden');
+    }
+    const prof = document.getElementById('nav-profile');
+    if (prof) prof.classList.remove('hidden');
 
-  renderProfileUI();
-  renderCategories();
-  renderAll();
-  
-  const loader = document.getElementById('app-loader');
-  if(loader) loader.style.display = 'none';
+    renderProfileUI();
+    renderCategories();
+    renderAll();
+  } catch(e) {
+    console.log('Init error', e);
+  } finally {
+    hideLoader(); // সবসময় হাইড
+  }
 }
 
 function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e) {}
 }
 
 function renderProfileUI() {
-  // পুরো নাম এবং ইউজার আইডি প্রদর্শন (WELCOME বা অনলাইন স্ট্যাটাস বাদ দিয়ে)
-  const fullName = user.last_name ? `${user.first_name} ${user.last_name}` : (user.first_name || 'Md Janina');
+  const fullName = user.last_name ? user.first_name + ' ' + user.last_name : (user.first_name || 'Md Janina');
   const uname = user.username ? '@' + user.username : '@username';
   const uid = user.id || '00000000';
 
-  document.getElementById('top-user-name').textContent = fullName;
-  document.getElementById('top-user-id').textContent = `ID: ${uid}`;
-  document.getElementById('prof-name').textContent = fullName;
-  document.getElementById('prof-username').textContent = uname;
-  document.getElementById('prof-id').textContent = uid;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('top-user-name', fullName);
+  set('top-user-id', 'ID: ' + uid);
+  set('prof-name', fullName);
+  set('prof-username', uname);
+  set('prof-id', uid);
 
-  const avatarBoxes = [document.getElementById('top-avatar-container'), document.getElementById('profile-avatar-container')];
-  avatarBoxes.forEach(box => {
+  [document.getElementById('top-avatar-container'), document.getElementById('profile-avatar-container')].forEach(box => {
     if (!box) return;
     if (user.photo_url) {
-      box.innerHTML = `<img src="${user.photo_url}" alt="Profile Photo"/>`;
+      box.innerHTML = '<img src="' + user.photo_url + '" alt=""/>';
     } else {
       const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-      box.innerHTML = `<div class="fallback-avatar">${initials}</div>`;
+      box.innerHTML = '<div class="fallback-avatar">' + initials + '</div>';
     }
   });
 }
 
 function renderCategories() {
   const container = document.getElementById('category-tabs');
-  container.innerHTML = state.categories.map(c => `
-    <button class="cat-pill ${currentCat === c.id ? 'active' : ''}" onclick="switchCat('${c.id}')">
-      ${c.name}
-    </button>
-  `).join('');
+  if (!container) return;
+  container.innerHTML = state.categories.map(c => 
+    '<button class="cat-pill ' + (currentCat === c.id ? 'active' : '') + '" onclick="switchCat(\'' + c.id + '\')">' + c.name + '</button>'
+  ).join('');
 
   const sel = document.getElementById('av-cat');
-  if(sel) {
-    sel.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+  if (sel) {
+    sel.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => 
+      '<option value="' + c.id + '">' + c.name + '</option>'
+    ).join('');
   }
 }
 
@@ -504,25 +463,17 @@ function createCard(v) {
   const catName = cat ? cat.name : 'VIRAL VIDEO';
   const thumb = v.thumb || 'https://via.placeholder.com/320x240?text=Viral+Video';
 
-  return `
-    <div class="video-card" onclick="openDetail('${v.id}')">
-      <div class="thumb-wrap">
-        <img src="${thumb}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x240?text=Viral+Video'"/>
-        <div class="status-badge ${isUnlocked ? 'badge-unlock' : 'badge-lock'}">
-          ${isUnlocked ? '🔓 Unlocked' : '🔒 Locked'}
-        </div>
-        <div class="play-overlay"><div class="play-icon">▶</div></div>
-      </div>
-      <div class="card-details">
-        <div style="margin-bottom:4px"><span class="card-tag">${catName}</span></div>
-        <div class="card-heading">${escapeHtml(v.title)}</div>
-        <div class="card-meta">
-          <span>👁 ${views}</span>
-          <span>${isFav ? '❤️' : '🤍'}</span>
-        </div>
-      </div>
-    </div>
-  `;
+  return '<div class="video-card" onclick="openDetail(\'' + v.id + '\')">' +
+    '<div class="thumb-wrap">' +
+      '<img src="' + thumb + '" loading="lazy" onerror="this.src=\'https://via.placeholder.com/320x240?text=Viral+Video\'"/>' +
+      '<div class="status-badge ' + (isUnlocked ? 'badge-unlock' : 'badge-lock') + '">' + (isUnlocked ? '🔓 Unlocked' : '🔒 Locked') + '</div>' +
+      '<div class="play-overlay"><div class="play-icon">▶</div></div>' +
+    '</div>' +
+    '<div class="card-details">' +
+      '<div style="margin-bottom:4px"><span class="card-tag">' + catName + '</span></div>' +
+      '<div class="card-heading">' + escapeHtml(v.title) + '</div>' +
+      '<div class="card-meta"><span>👁 ' + views + '</span><span>' + (isFav ? '❤️' : '🤍') + '</span></div>' +
+    '</div></div>';
 }
 
 function renderAll() {
@@ -535,50 +486,40 @@ function renderAll() {
 
 function renderHome() {
   const grid = document.getElementById('main-grid');
-  const q = document.getElementById('main-search').value.toLowerCase().trim();
-  let vids = state.videos;
-  
-  if (currentCat !== 'cat_all') {
-    vids = vids.filter(v => v.category_id === currentCat);
-  }
-  if (q) {
-    vids = vids.filter(v => v.title.toLowerCase().includes(q));
-  }
-  
+  if (!grid) return;
+  const q = (document.getElementById('main-search') || {}).value || '';
+  let vids = state.videos || [];
+  if (currentCat !== 'cat_all') vids = vids.filter(v => v.category_id === currentCat);
+  if (q.trim()) vids = vids.filter(v => (v.title || '').toLowerCase().includes(q.toLowerCase()));
   grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>📹</i>কোনো ভিডিও পাওয়া যায়নি</div>';
 }
 
 function renderFavs() {
   const grid = document.getElementById('fav-grid');
-  const vids = state.videos.filter(v => state.favorites[v.id]);
+  if (!grid) return;
+  const vids = (state.videos || []).filter(v => state.favorites[v.id]);
   grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>❤️</i>পছন্দের ভিডিও নেই</div>';
 }
 
 function renderTutorial() {
   const grid = document.getElementById('tutorial-grid');
-  const vids = state.videos.filter(v => state.unlocked[v.id]);
+  if (!grid) return;
+  const vids = (state.videos || []).filter(v => state.unlocked[v.id]);
   grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>🔓</i>কোনো আনলক করা ভিডিও নেই</div>';
 }
 
 function renderViralLinks() {
   const cont = document.getElementById('viral-links-container');
+  if (!cont) return;
   const links = state.viralLinks || [];
   if (!links.length) {
     cont.innerHTML = '<div class="empty-state"><i>🔗</i>কোনো লিংক নেই</div>';
     return;
   }
-  cont.innerHTML = links.map(l => `
-    <div class="viral-link-box">
-      <div class="v-info">
-        <div class="v-icon">✈️</div>
-        <div>
-          <div class="v-title">${escapeHtml(l.title)}</div>
-          <div class="v-url">international viral link hub</div>
-        </div>
-      </div>
-      <button class="btn btn-primary" style="width:auto;padding:8px 18px;font-size:12px;border-radius:30px" onclick="openExternal('${l.url}')">Open</button>
-    </div>
-  `).join('');
+  cont.innerHTML = links.map(l => 
+    '<div class="viral-link-box"><div class="v-info"><div class="v-icon">✈️</div><div><div class="v-title">' + escapeHtml(l.title) + '</div><div class="v-url">international viral link hub</div></div></div>' +
+    '<button class="btn btn-primary" style="width:auto;padding:8px 18px;font-size:12px;border-radius:30px" onclick="openExternal(\'' + (l.url || '') + '\')">Open</button></div>'
+  ).join('');
 }
 
 function openExternal(url) {
@@ -587,15 +528,13 @@ function openExternal(url) {
   if (tg.openLink) tg.openLink(finalUrl); else window.open(finalUrl, '_blank');
 }
 
-async function openDetail(id) {
-  let v = state.videos.find(x => x.id === id);
+function openDetail(id) {
+  const v = (state.videos || []).find(x => x.id === id);
   if (!v) return;
   currentActiveVid = v;
-
   if (!v.views) v.views = {};
   v.views[user.id] = true;
   saveState();
-
   updateModalUI(v);
   document.getElementById('modal-detail').classList.add('open');
 }
@@ -606,40 +545,31 @@ function updateModalUI(v) {
   const req = v.required_ads || 1;
   const pct = Math.floor((prog / req) * 100);
 
-  document.getElementById('md-title').textContent = v.title;
+  document.getElementById('md-title').textContent = v.title || '';
   const views = v.views ? Object.keys(v.views).length : 135;
-  document.getElementById('md-views').textContent = views + " Views";
-  
+  document.getElementById('md-views').textContent = views + ' Views';
+
   const favBtn = document.getElementById('md-fav-btn');
-  favBtn.textContent = state.favorites[v.id] ? "❤️" : "🤍";
-  favBtn.onclick = () => { toggleFav(v.id); updateModalUI(v); };
+  favBtn.textContent = state.favorites[v.id] ? '❤️' : '🤍';
+  favBtn.onclick = function() { toggleFav(v.id); updateModalUI(v); };
 
   if (!state.reactions[v.id]) state.reactions[v.id] = [];
-  const reacted = state.reactions[v.id].includes(user.id);
+  const reacted = state.reactions[v.id].indexOf(user.id) > -1;
   document.getElementById('md-react-btn').style.color = reacted ? 'var(--primary)' : 'inherit';
   document.getElementById('md-react-count').textContent = state.reactions[v.id].length;
 
   const media = document.getElementById('md-media-container');
   if (isUnlocked && v.link) {
-    media.innerHTML = `<video src="${v.link}" controls style="width:100%;height:100%"></video>`;
+    media.innerHTML = '<video src="' + v.link + '" controls style="width:100%;height:100%"></video>';
   } else {
-    media.innerHTML = `<div style="width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff;font-size:14px">🔒 Protected Media</div>`;
+    media.innerHTML = '<div style="width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff;font-size:14px">🔒 Protected Media</div>';
   }
 
   const action = document.getElementById('md-action-area');
   if (isUnlocked) {
-    action.innerHTML = `
-      <div class="admin-panel-card" style="text-align:center;background:rgba(16,185,129,0.1)">
-        <h4 style="color:var(--success);margin-bottom:8px">🔓 ভিডিও আনলকড!</h4>
-        <a href="${v.link || '#'}" target="_blank" download class="btn btn-success" style="text-decoration:none;display:inline-flex;">📥 ভিডিও ডাউনলোড করুন</a>
-      </div>`;
+    action.innerHTML = '<div class="admin-panel-card" style="text-align:center;background:rgba(16,185,129,0.1)"><h4 style="color:var(--success);margin-bottom:8px">🔓 ভিডিও আনলকড!</h4><a href="' + (v.link || '#') + '" target="_blank" download class="btn btn-success" style="text-decoration:none;display:inline-flex;">📥 ভিডিও ডাউনলোড করুন</a></div>';
   } else {
-    action.innerHTML = `
-      <div class="progress-wrap">
-        <div class="progress-labels"><span>আনলক প্রোগ্রেস</span><span>${prog}/${req} Ads</span></div>
-        <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
-      </div>
-      <button class="btn btn-primary" onclick="watchAd()">📺 WATCH AD TO UNLOCK</button>`;
+    action.innerHTML = '<div class="progress-wrap"><div class="progress-labels"><span>আনলক প্রোগ্রেস</span><span>' + prog + '/' + req + ' Ads</span></div><div class="progress-bar-track"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div></div><button class="btn btn-primary" onclick="watchAd()">📺 WATCH AD TO UNLOCK</button>';
   }
   renderComments(v.id);
 }
@@ -659,32 +589,31 @@ async function watchAd() {
   if (isAdShowing) return;
   const v = currentActiveVid;
   if (typeof show_11458857 !== 'function') {
-    showCustomConfirm("বিজ্ঞাপন", "অ্যাড SDK লোড হয়নি। সরাসরি আনলক করতে চান?", () => { handleAdSuccess(v.id); });
+    showCustomConfirm('বিজ্ঞাপন', 'অ্যাড SDK লোড হয়নি। সরাসরি আনলক করতে চান?', function() { handleAdSuccess(v.id); });
     return;
   }
   isAdShowing = true;
   try {
     await show_11458857();
     handleAdSuccess(v.id);
-  } catch (e) {
-    showToast("বিজ্ঞাপন সম্পন্ন হয়নি।", "danger");
+  } catch(e) {
+    showToast('বিজ্ঞাপন সম্পন্ন হয়নি।', 'danger');
   } finally {
     isAdShowing = false;
   }
 }
 
 function handleAdSuccess(vidId) {
-  const v = state.videos.find(x => x.id === vidId) || currentActiveVid;
+  const v = (state.videos || []).find(x => x.id === vidId) || currentActiveVid;
   if (!v) return;
   const req = v.required_ads || 1;
   state.progress[vidId] = (state.progress[vidId] || 0) + 1;
-
   if (state.progress[vidId] >= req) {
     state.unlocked[vidId] = true;
     delete state.progress[vidId];
-    showToast("ভিডিও সফলভাবে আনলক হয়েছে! 🎉", "success");
+    showToast('ভিডিও সফলভাবে আনলক হয়েছে! 🎉', 'success');
   } else {
-    showToast("বিজ্ঞাপন দেখা সফল!", "info");
+    showToast('বিজ্ঞাপন দেখা সফল!', 'info');
   }
   saveState();
   renderAll();
@@ -692,213 +621,196 @@ function handleAdSuccess(vidId) {
 }
 
 async function saveVideo() {
-  const title = document.getElementById('av-title').value.trim();
-  const catId = document.getElementById('av-cat').value;
-  const ads = parseInt(document.getElementById('av-ads').value) || 1;
-  const thumbFile = document.getElementById('av-thumb-file').files[0];
+  const title = (document.getElementById('av-title') || {}).value || '';
+  const catId = (document.getElementById('av-cat') || {}).value || '';
+  const ads = parseInt((document.getElementById('av-ads') || {}).value) || 1;
+  const thumbFile = (document.getElementById('av-thumb-file') || {}).files?.[0];
   const fileInput = document.getElementById('av-file');
   const btn = document.getElementById('upload-btn');
-
-  if (!title || !fileInput.files[0]) return showToast("শিরোনাম এবং ভিডিও ফাইল দিন");
+  if (!title.trim() || !fileInput || !fileInput.files[0]) return showToast('শিরোনাম এবং ভিডিও ফাইল দিন');
 
   btn.disabled = true;
-  btn.textContent = "ক্লাউডে আপলোড হচ্ছে... ⏳";
-
+  btn.textContent = 'ক্লাউডে আপলোড হচ্ছে... ⏳';
   try {
-    const videoFile = fileInput.files[0];
-    const unique = Date.now() + '_' + Math.random().toString(36).substring(2, 6);
-    const videoName = `vid_${unique}.${videoFile.name.split('.').pop()}`;
-    let thumbUrl = '';
-
     if (supabaseClient) {
+      const videoFile = fileInput.files[0];
+      const unique = Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+      const videoName = 'vid_' + unique + '.' + videoFile.name.split('.').pop();
+      let thumbUrl = '';
       if (thumbFile) {
-        const thumbName = `thumb_${unique}.${thumbFile.name.split('.').pop()}`;
+        const thumbName = 'thumb_' + unique + '.' + thumbFile.name.split('.').pop();
         await supabaseClient.storage.from(BUCKET_NAME).upload(thumbName, thumbFile);
-        const { data: tPub } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(thumbName);
-        thumbUrl = tPub.publicUrl;
+        const tPub = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(thumbName);
+        thumbUrl = tPub.data.publicUrl;
       }
       await supabaseClient.storage.from(BUCKET_NAME).upload(videoName, videoFile);
-      const { data: vPub } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(videoName);
-      
-      const newVid = { id: 'v_' + Date.now(), title, category_id: catId, link: vPub.publicUrl, required_ads: ads, thumb: thumbUrl, views: {} };
+      const vPub = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(videoName);
+      const newVid = { id: 'v_' + Date.now(), title: title.trim(), category_id: catId, link: vPub.data.publicUrl, required_ads: ads, thumb: thumbUrl, views: {} };
       await supabaseClient.from('videos').insert([newVid]);
       state.videos.push(newVid);
     }
     saveState();
     renderAll();
-    showToast("সফলভাবে আপলোড হয়েছে! ✅", "success");
+    showToast('সফলভাবে আপলোড হয়েছে! ✅', 'success');
     document.getElementById('av-title').value = '';
     document.getElementById('av-file').value = '';
-  } catch (e) {
-    showToast("আপলোড ব্যর্থ হয়েছে!", "danger");
+  } catch(e) {
+    showToast('আপলোড ব্যর্থ হয়েছে!', 'danger');
   } finally {
     btn.disabled = false;
-    btn.textContent = "ক্লাউডে আপলোড করুন";
+    btn.textContent = 'ক্লাউডে আপলোড করুন';
   }
 }
 
-async function deleteVideo(id) {
-  showCustomConfirm("ডিলিট", "ভিডিওটি মুছে ফেলতে চান?", async () => {
-    if (supabaseClient) {
-      try { await supabaseClient.from('videos').delete().eq('id', id); } catch(e){}
-    }
+function deleteVideo(id) {
+  showCustomConfirm('ডিলিট', 'ভিডিওটি মুছে ফেলতে চান?', async function() {
+    if (supabaseClient) try { await supabaseClient.from('videos').delete().eq('id', id); } catch(e) {}
     state.videos = state.videos.filter(x => x.id !== id);
     saveState();
     renderAll();
-    showToast("ভিডিও ডিলিট হয়েছে!", "success");
+    showToast('ভিডিও ডিলিট হয়েছে!', 'success');
   });
 }
 
-async function saveCategory() {
-  const name = document.getElementById('ac-name').value.trim();
-  if (!name) return showToast("ক্যাটাগরির নাম দিন");
-
-  const newCat = { id: 'cat_' + Date.now(), name };
-  if (supabaseClient) {
-    try { await supabaseClient.from('categories').insert([newCat]); } catch(e){}
-  }
+function saveCategory() {
+  const name = (document.getElementById('ac-name') || {}).value || '';
+  if (!name.trim()) return showToast('ক্যাটাগরির নাম দিন');
+  const newCat = { id: 'cat_' + Date.now(), name: name.trim() };
+  if (supabaseClient) try { supabaseClient.from('categories').insert([newCat]); } catch(e) {}
   state.categories.push(newCat);
   saveState();
   renderCategories();
   renderAdminCategories();
-  showToast("ক্যাটাগরি সেভ হয়েছে!", "success");
+  showToast('ক্যাটাগরি সেভ হয়েছে!', 'success');
   document.getElementById('ac-name').value = '';
 }
 
-async function deleteCategory(id) {
-  if (id === 'cat_all') return showToast("All ক্যাটাগরি ডিলিট করা যাবে না!", "danger");
-  showCustomConfirm("ডিলিট", "ক্যাটাগরি মুছে ফেলতে চান?", async () => {
-    if (supabaseClient) {
-      try { await supabaseClient.from('categories').delete().eq('id', id); } catch(e){}
-    }
+function deleteCategory(id) {
+  if (id === 'cat_all') return showToast('All ক্যাটাগরি ডিলিট করা যাবে না!', 'danger');
+  showCustomConfirm('ডিলিট', 'ক্যাটাগরি মুছে ফেলতে চান?', async function() {
+    if (supabaseClient) try { await supabaseClient.from('categories').delete().eq('id', id); } catch(e) {}
     state.categories = state.categories.filter(c => c.id !== id);
     if (currentCat === id) currentCat = 'cat_all';
     saveState();
     renderCategories();
     renderAll();
-    showToast("ক্যাটাগরি ডিলিট হয়েছে!", "success");
+    showToast('ক্যাটাগরি ডিলিট হয়েছে!', 'success');
   });
 }
 
-async function saveViralLink() {
-  const title = document.getElementById('avl-title').value.trim();
-  const url = document.getElementById('avl-url').value.trim();
-  if (!title || !url) return showToast("টাইটেল ও লিংক দিন");
-
-  const linkObj = { id: 'vl_' + Date.now(), title, url };
-  if (supabaseClient) {
-    try { await supabaseClient.from('viral_links').insert([linkObj]); } catch(e){}
-  }
+function saveViralLink() {
+  const title = (document.getElementById('avl-title') || {}).value || '';
+  const url = (document.getElementById('avl-url') || {}).value || '';
+  if (!title.trim() || !url.trim()) return showToast('টাইটেল ও লিংক দিন');
+  const linkObj = { id: 'vl_' + Date.now(), title: title.trim(), url: url.trim() };
+  if (supabaseClient) try { supabaseClient.from('viral_links').insert([linkObj]); } catch(e) {}
   if (!state.viralLinks) state.viralLinks = [];
   state.viralLinks.push(linkObj);
   saveState();
   renderAll();
-  showToast("লিংক যোগ হয়েছে!", "success");
+  showToast('লিংক যোগ হয়েছে!', 'success');
   document.getElementById('avl-title').value = '';
   document.getElementById('avl-url').value = '';
 }
 
-async function deleteViralLink(id) {
-  showCustomConfirm("ডিলিট", "লিংকটি মুছে ফেলতে চান?", async () => {
-    if (supabaseClient) {
-      try { await supabaseClient.from('viral_links').delete().eq('id', id); } catch(e){}
-    }
+function deleteViralLink(id) {
+  showCustomConfirm('ডিলিট', 'লিংকটি মুছে ফেলতে চান?', async function() {
+    if (supabaseClient) try { await supabaseClient.from('viral_links').delete().eq('id', id); } catch(e) {}
     state.viralLinks = state.viralLinks.filter(l => l.id !== id);
     saveState();
     renderAll();
-    showToast("লিংক ডিলিট হয়েছে!", "success");
+    showToast('লিংক ডিলিট হয়েছে!', 'success');
   });
 }
 
 function renderAdmin() {
   if (Number(user.id) !== ADMIN_ID) return;
-  
-  document.getElementById('admin-vid-list').innerHTML = state.videos.map(v => `
-    <div class="admin-list-row">
-      <div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(v.title)}</div>
-      <button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteVideo('${v.id}')">ডিলিট</button>
-    </div>
-  `).join('');
-
-  const links = state.viralLinks || [];
-  document.getElementById('admin-viral-list').innerHTML = links.map(l => `
-    <div class="admin-list-row">
-      <div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(l.title)}</div>
-      <button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteViralLink('${l.id}')">ডিলিট</button>
-    </div>
-  `).join('');
-
+  const vidList = document.getElementById('admin-vid-list');
+  if (vidList) {
+    vidList.innerHTML = (state.videos || []).map(v => 
+      '<div class="admin-list-row"><div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(v.title) + '</div><button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteVideo(\'' + v.id + '\')">ডিলিট</button></div>'
+    ).join('');
+  }
+  const viralList = document.getElementById('admin-viral-list');
+  if (viralList) {
+    viralList.innerHTML = (state.viralLinks || []).map(l => 
+      '<div class="admin-list-row"><div style="font-size:12px;font-weight:700;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(l.title) + '</div><button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteViralLink(\'' + l.id + '\')">ডিলিট</button></div>'
+    ).join('');
+  }
   renderAdminCategories();
 }
 
 function renderAdminCategories() {
   const catListDiv = document.getElementById('admin-cat-list');
-  if(!catListDiv) return;
-  catListDiv.innerHTML = state.categories.map(c => `
-    <div class="admin-list-row">
-      <div style="font-size:12px;font-weight:700;">${escapeHtml(c.name)}</div>
-      ${c.id !== 'cat_all' ? `<button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteCategory('${c.id}')">ডিলিট</button>` : `<span style="font-size:11px;color:var(--muted)">Default</span>`}
-    </div>
-  `).join('');
+  if (!catListDiv) return;
+  catListDiv.innerHTML = state.categories.map(c => 
+    '<div class="admin-list-row"><div style="font-size:12px;font-weight:700;">' + escapeHtml(c.name) + '</div>' + 
+    (c.id !== 'cat_all' ? '<button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteCategory(\'' + c.id + '\')">ডিলিট</button>' : '<span style="font-size:11px;color:var(--muted)">Default</span>') + 
+    '</div>'
+  ).join('');
 }
 
 function switchAdminSub(subId, btn) {
   document.querySelectorAll('.admin-subview').forEach(s => s.classList.add('hidden'));
-  document.getElementById('admin-sub-' + subId).classList.remove('hidden');
-  btn.parentElement.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
+  const el = document.getElementById('admin-sub-' + subId);
+  if (el) el.classList.remove('hidden');
+  if (btn && btn.parentElement) {
+    btn.parentElement.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
 }
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById('view-' + id).classList.add('active');
-  
+  const view = document.getElementById('view-' + id);
+  if (view) view.classList.add('active');
   const navs = document.querySelectorAll('.nav-btn');
   navs.forEach(n => n.classList.remove('active'));
-  // মেনু বাটনগুলোর সঠিক ইন্ডেক্স ম্যাপ (টিউটোরিয়াল বাদ দেওয়ায় আপডেট করা হয়েছে)
-  const map = { 'home':0, 'fav':1, 'links':2, 'profile':3, 'admin':4 };
-  if(map[id] !== undefined && navs[map[id]]) navs[map[id]].classList.add('active');
+  const map = { home: 0, fav: 1, links: 2, profile: 3, admin: 4 };
+  if (map[id] !== undefined && navs[map[id]]) navs[map[id]].classList.add('active');
 }
 
 function switchCat(id) { currentCat = id; renderCategories(); renderHome(); }
 function handleSearch() { renderHome(); }
 function toggleFav(id) { state.favorites[id] = !state.favorites[id]; saveState(); renderAll(); }
 
-function showToast(msg, type='info') {
+function showToast(msg, type) {
   const box = document.getElementById('toast-box');
+  if (!box) return;
   const t = document.createElement('div');
   t.className = 'toast-item';
-  t.innerHTML = `<span>${type==='success'?'✅':'ℹ️'}</span> ${escapeHtml(msg)}`;
+  t.innerHTML = '<span>' + (type === 'success' ? '✅' : 'ℹ️') + '</span> ' + escapeHtml(msg);
   box.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(function() { t.remove(); }, 3000);
 }
 
 function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.getElementById('md-media-container').innerHTML = '';
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('open');
+  const media = document.getElementById('md-media-container');
+  if (media) media.innerHTML = '';
 }
 
 function escapeHtml(str) {
   if (!str) return '';
-  return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function renderComments(vidId) {
   const list = state.comments[vidId] || [];
-  document.getElementById('md-comments-list').innerHTML = list.map(c => `
-    <div class="comment-bubble">
-      <div class="comment-header"><span>${escapeHtml(c.user)}</span></div>
-      <div style="font-size:12px">${escapeHtml(c.text)}</div>
-    </div>
-  `).join('');
+  const el = document.getElementById('md-comments-list');
+  if (!el) return;
+  el.innerHTML = list.map(c => 
+    '<div class="comment-bubble"><div class="comment-header"><span>' + escapeHtml(c.user) + '</span></div><div style="font-size:12px">' + escapeHtml(c.text) + '</div></div>'
+  ).join('');
 }
 
 function postComment() {
   const input = document.getElementById('md-comment-input');
-  const text = input.value.trim();
-  if (!text || !currentActiveVid) return;
+  const text = (input || {}).value || '';
+  if (!text.trim() || !currentActiveVid) return;
   if (!state.comments[currentActiveVid.id]) state.comments[currentActiveVid.id] = [];
-  state.comments[currentActiveVid.id].unshift({ user: user.first_name || 'User', text });
+  state.comments[currentActiveVid.id].unshift({ user: user.first_name || 'User', text: text.trim() });
   input.value = '';
   saveState();
   renderComments(currentActiveVid.id);
@@ -914,7 +826,8 @@ function exportData() {
 }
 
 function triggerImport() {
-  document.getElementById('import-file-input').click();
+  const el = document.getElementById('import-file-input');
+  if (el) el.click();
 }
 
 function importData(event) {
@@ -924,23 +837,31 @@ function importData(event) {
   reader.onload = function(e) {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (parsed.unlocked) state.unlocked = { ...state.unlocked, ...parsed.unlocked };
-      if (parsed.favorites) state.favorites = { ...state.favorites, ...parsed.favorites };
+      if (parsed.unlocked) state.unlocked = Object.assign({}, state.unlocked, parsed.unlocked);
+      if (parsed.favorites) state.favorites = Object.assign({}, state.favorites, parsed.favorites);
       saveState();
       renderAll();
-      showToast("ব্যাকআপ সফলভাবে রিস্টোর হয়েছে! ✅", "success");
+      showToast('ব্যাকআপ সফলভাবে রিস্টোর হয়েছে! ✅', 'success');
     } catch(err) {
-      showToast("ভুল ফাইল ফরম্যাট!", "danger");
+      showToast('ভুল ফাইল ফরম্যাট!', 'danger');
     }
   };
   reader.readAsText(file);
 }
 
 function shareVideo() {
-  if (tg.switchInlineQuery) tg.switchInlineQuery("Check out this video!");
+  if (tg.switchInlineQuery) tg.switchInlineQuery('Check out this video!');
 }
 
-window.onload = initApp;
+// অ্যাপ চালু
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// অতিরিক্ত সেফটি
+setTimeout(hideLoader, 2500);
 </script>
 </body>
 </html>
