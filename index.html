@@ -79,13 +79,75 @@
   .card-meta{margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted)}
   .card-tag{background:rgba(236,72,153,0.15);color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:700;font-size:9px;text-transform:uppercase}
 
+  /* Empty State - বড় ও মাঝখানে */
+  .empty-state{
+    text-align:center;
+    padding:80px 20px 40px;
+    color:var(--muted);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    min-height:280px;
+  }
+  .empty-state i{
+    font-size:64px;
+    display:block;
+    margin-bottom:16px;
+    line-height:1;
+  }
+  .empty-state p{
+    font-size:16px;
+    font-weight:600;
+    color:var(--muted);
+    margin:0;
+  }
+
+  /* Profile - ডার্ক থিমের সাথে মানানসই */
   .profile-container{padding-top:10px}
-  .profile-identity-card{background:#fff;color:#0b0e14;border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3)}
-  .profile-avatar-box{width:84px;height:84px;border-radius:50%;background:var(--gradient-btn);margin:0 auto 12px;padding:3px;box-shadow:0 8px 25px var(--primary-glow)}
-  .profile-avatar-box img, .profile-avatar-box .fallback-avatar{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface-light);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:800}
-  .profile-name{font-size:18px;font-weight:800;margin-bottom:2px;color:#0b0e14}
-  .profile-username{font-size:13px;color:#64748b;margin-bottom:12px}
-  .profile-id-pill{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 14px;border-radius:30px;font-size:12px;font-weight:700;color:#0b0e14}
+  .profile-identity-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:30px 20px;
+    text-align:center;
+    margin-bottom:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  }
+  .profile-avatar-box{
+    width:90px;height:90px;
+    border-radius:50%;
+    background:var(--gradient-btn);
+    margin:0 auto 14px;
+    padding:3px;
+    box-shadow:0 8px 25px var(--primary-glow);
+  }
+  .profile-avatar-box img, 
+  .profile-avatar-box .fallback-avatar{
+    width:100%;height:100%;
+    border-radius:50%;
+    object-fit:cover;
+    background:var(--surface-light);
+    color:#fff;
+    display:grid;
+    place-items:center;
+    font-size:30px;
+    font-weight:800;
+  }
+  .profile-name{font-size:19px;font-weight:800;margin-bottom:4px;color:#fff}
+  .profile-username{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .profile-id-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-light);
+    border:1px solid var(--border);
+    padding:7px 16px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+  }
 
   .profile-menu-list{background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-bottom:20px}
   .profile-menu-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer}
@@ -99,7 +161,7 @@
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* ========== Bottom Navigation - সব ধূসর, ক্লিক করলে গোলাপি ========== */
+  /* Bottom Navigation - সব ধূসর, ক্লিক করলে গোলাপি */
   .bottom-nav{
     position:fixed;
     bottom:0;
@@ -119,7 +181,7 @@
     align-items:center;
     justify-content:center;
     gap:4px;
-    color:#6b7280 !important;          /* সব বাটন ধূসর */
+    color:#6b7280 !important;
     font-size:11px;
     font-weight:600;
     flex:1;
@@ -133,13 +195,13 @@
     outline:none;
   }
   .nav-btn.active{
-    color:#ec4899 !important;          /* ক্লিক করলে গোলাপি */
+    color:#ec4899 !important;
     background:transparent !important;
     box-shadow:none !important;
   }
   .nav-btn i,
   .nav-btn span{
-    color:inherit !important;          /* আইকন ও টেক্সট একই রঙ পাবে */
+    color:inherit !important;
   }
   .nav-btn i{
     font-size:22px;
@@ -187,9 +249,7 @@
   #toast-box{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:4000;width:90%;max-width:380px;pointer-events:none}
   .toast-item{background:var(--surface);border:1px solid var(--border);padding:12px 18px;border-radius:14px;margin-bottom:10px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,0.5);display:flex;align-items:center;gap:12px;font-weight:600;color:#fff}
 
-  .hidden{display:none}
-  .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
-  .empty-state i{font-size:36px;display:block;margin-bottom:10px}
+  .hidden{display:none !important}
   </style>
 </head>
 <body>
@@ -229,6 +289,7 @@
   </div>
 </div>
 
+<!-- ক্যাটাগরি শুধু হোমে দেখাবে -->
 <div class="cat-scroll" id="category-tabs"></div>
 
 <section class="view active" id="view-home">
@@ -256,7 +317,7 @@
       <div class="profile-avatar-box" id="profile-avatar-container"></div>
       <div class="profile-name" id="prof-name">ইউজার</div>
       <div class="profile-username" id="prof-username">@username</div>
-      <div class="profile-id-pill"><span>🆔 ID:</span> <span id="prof-id">00000000</span></div>
+      <div class="profile-id-pill"><span>🆔</span> <span id="prof-id">00000000</span></div>
     </div>
     <div class="profile-menu-list">
       <div class="profile-menu-item" onclick="showView('fav')"><div class="menu-item-left"><span>❤️</span><span>Favorites</span></div><span>›</span></div>
@@ -442,6 +503,8 @@ async function initApp() {
     renderProfileUI();
     renderCategories();
     renderAll();
+    // প্রথমে হোম ভিউতে ক্যাটাগরি দেখাও
+    toggleCategoryTabs('home');
   } catch(e) {
     console.log('Init error', e);
   } finally {
@@ -527,21 +590,36 @@ function renderHome() {
   let vids = state.videos || [];
   if (currentCat !== 'cat_all') vids = vids.filter(v => v.category_id === currentCat);
   if (q.trim()) vids = vids.filter(v => (v.title || '').toLowerCase().includes(q.toLowerCase()));
-  grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>📹</i>কোনো ভিডিও পাওয়া যায়নি</div>';
+  
+  if (vids.length) {
+    grid.innerHTML = vids.map(createCard).join('');
+  } else {
+    grid.innerHTML = '<div class="empty-state"><i>📹</i><p>কোনো ভিডিও পাওয়া যায়নি</p></div>';
+  }
 }
 
 function renderFavs() {
   const grid = document.getElementById('fav-grid');
   if (!grid) return;
   const vids = (state.videos || []).filter(v => state.favorites[v.id]);
-  grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>❤️</i>পছন্দের ভিডিও নেই</div>';
+  
+  if (vids.length) {
+    grid.innerHTML = vids.map(createCard).join('');
+  } else {
+    grid.innerHTML = '<div class="empty-state"><i>❤️</i><p>পছন্দের ভিডিও নেই</p></div>';
+  }
 }
 
 function renderTutorial() {
   const grid = document.getElementById('tutorial-grid');
   if (!grid) return;
   const vids = (state.videos || []).filter(v => state.unlocked[v.id]);
-  grid.innerHTML = vids.length ? vids.map(createCard).join('') : '<div class="empty-state"><i>🔓</i>কোনো আনলক করা ভিডিও নেই</div>';
+  
+  if (vids.length) {
+    grid.innerHTML = vids.map(createCard).join('');
+  } else {
+    grid.innerHTML = '<div class="empty-state"><i>🔓</i><p>কোনো আনলক করা ভিডিও নেই</p></div>';
+  }
 }
 
 function renderViralLinks() {
@@ -549,7 +627,7 @@ function renderViralLinks() {
   if (!cont) return;
   const links = state.viralLinks || [];
   if (!links.length) {
-    cont.innerHTML = '<div class="empty-state"><i>🔗</i>কোনো লিংক নেই</div>';
+    cont.innerHTML = '<div class="empty-state"><i>🔗</i><p>কোনো লিংক নেই</p></div>';
     return;
   }
   cont.innerHTML = links.map(l => 
@@ -796,10 +874,24 @@ function switchAdminSub(subId, btn) {
   }
 }
 
+/* ক্যাটাগরি শুধু হোমে দেখাবে */
+function toggleCategoryTabs(viewId) {
+  const catTabs = document.getElementById('category-tabs');
+  if (!catTabs) return;
+  if (viewId === 'home') {
+    catTabs.classList.remove('hidden');
+  } else {
+    catTabs.classList.add('hidden');
+  }
+}
+
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const view = document.getElementById('view-' + id);
   if (view) view.classList.add('active');
+
+  // ক্যাটাগরি শুধু হোমে
+  toggleCategoryTabs(id);
 
   // সব বাটন থেকে active সরানো
   document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
