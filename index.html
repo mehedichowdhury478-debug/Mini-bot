@@ -99,11 +99,53 @@
   .v-title{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .v-url{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px}
 
-  /* Bottom Nav - 2nd image style */
-  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:150}
-  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6b7280;font-size:11px;font-weight:600;flex:1;background:transparent;border:none;cursor:pointer;font-family:inherit;transition:color 0.2s;padding:6px 0}
-  .nav-btn.active{color:var(--primary);background:transparent}
-  .nav-btn i{font-size:20px;font-style:normal;line-height:1}
+  /* ========== Bottom Navigation - সব ধূসর, ক্লিক করলে গোলাপি ========== */
+  .bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:rgba(11,14,20,0.97);
+    backdrop-filter:blur(20px);
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-around;
+    padding:10px 4px calc(10px + env(safe-area-inset-bottom));
+    z-index:150;
+  }
+  .nav-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+    color:#6b7280 !important;          /* সব বাটন ধূসর */
+    font-size:11px;
+    font-weight:600;
+    flex:1;
+    background:transparent !important;
+    border:none !important;
+    cursor:pointer;
+    font-family:inherit;
+    transition:color 0.2s ease;
+    padding:6px 0;
+    box-shadow:none !important;
+    outline:none;
+  }
+  .nav-btn.active{
+    color:#ec4899 !important;          /* ক্লিক করলে গোলাপি */
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .nav-btn i,
+  .nav-btn span{
+    color:inherit !important;          /* আইকন ও টেক্সট একই রঙ পাবে */
+  }
+  .nav-btn i{
+    font-size:22px;
+    font-style:normal;
+    line-height:1;
+  }
 
   .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:none;align-items:flex-end}
   .modal-overlay.open{display:flex}
@@ -308,7 +350,6 @@
 <div id="toast-box"></div>
 
 <script>
-// ========== লোডার জোর করে হাইড ==========
 function hideLoader() {
   const loader = document.getElementById('app-loader');
   if (loader) {
@@ -316,11 +357,8 @@ function hideLoader() {
     setTimeout(() => { loader.style.display = 'none'; }, 300);
   }
 }
+setTimeout(hideLoader, 800);
 
-// ১ সেকেন্ডের মধ্যে লোডার হাইড (সেফটি)
-setTimeout(hideLoader, 1000);
-
-// ========== মূল ভেরিয়েবল ==========
 const ADMIN_ID = 6377295796;
 const STORE_KEY = "ViralVideo_App_V3";
 const BUCKET_NAME = "Viral Video";
@@ -372,13 +410,11 @@ async function initApp() {
     if (tg.ready) tg.ready();
     if (tg.expand) tg.expand();
 
-    // লোকাল স্টোরেজ
     try {
       const saved = localStorage.getItem(STORE_KEY);
       if (saved) state = { ...state, ...JSON.parse(saved) };
     } catch(e) {}
 
-    // Supabase (ব্যাকগ্রাউন্ডে, এরর হলে স্কিপ)
     if (supabaseClient) {
       try {
         const [v, c, l] = await Promise.allSettled([
@@ -409,7 +445,7 @@ async function initApp() {
   } catch(e) {
     console.log('Init error', e);
   } finally {
-    hideLoader(); // সবসময় হাইড
+    hideLoader();
   }
 }
 
@@ -764,10 +800,16 @@ function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const view = document.getElementById('view-' + id);
   if (view) view.classList.add('active');
-  const navs = document.querySelectorAll('.nav-btn');
-  navs.forEach(n => n.classList.remove('active'));
+
+  // সব বাটন থেকে active সরানো
+  document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+
+  // সঠিক বাটনে active দেওয়া
   const map = { home: 0, fav: 1, links: 2, profile: 3, admin: 4 };
-  if (map[id] !== undefined && navs[map[id]]) navs[map[id]].classList.add('active');
+  const navs = document.querySelectorAll('.nav-btn');
+  if (map[id] !== undefined && navs[map[id]]) {
+    navs[map[id]].classList.add('active');
+  }
 }
 
 function switchCat(id) { currentCat = id; renderCategories(); renderHome(); }
@@ -853,15 +895,12 @@ function shareVideo() {
   if (tg.switchInlineQuery) tg.switchInlineQuery('Check out this video!');
 }
 
-// অ্যাপ চালু
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initApp);
 } else {
   initApp();
 }
-
-// অতিরিক্ত সেফটি
-setTimeout(hideLoader, 2500);
+setTimeout(hideLoader, 2000);
 </script>
 </body>
 </html>
