@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>VidUnlock</title>
+  <title>VidUnlock - Secure Pro</title>
 
-  <!-- Google Fonts (Bangla & English) -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
   <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&amp;family=Inter:wght@400;600;800&amp;display=swap" rel="stylesheet"/>
@@ -18,9 +18,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-  /* =========================================================
-     CORE DESIGN SYSTEM
-     ========================================================= */
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   :root{
     --bg:#0b0d17;
@@ -79,8 +76,8 @@
 
   /* VIEWS */
   .view{display:none;padding:0 16px}
-  .view.active{display:block;animation:fadeIn 0.4s ease}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .view.active{display:block;animation:fadeIn 0.3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
   .page-title{font-size:18px;font-weight:800;margin:20px 0 15px;display:flex;align-items:center;gap:8px}
 
   /* GRID & CARDS */
@@ -110,10 +107,18 @@
   /* MODAL / BOTTOM SHEET */
   .modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);display:none;align-items:flex-end}
   .modal.open{display:flex}
-  .modal-sheet{background:var(--bg);width:100%;max-height:92vh;border-radius:28px 28px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:slideUp 0.4s cubic-bezier(0,0,0.2,1)}
+  .modal-sheet{background:var(--bg);width:100%;max-height:92vh;border-radius:28px 28px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:slideUp 0.3s cubic-bezier(0,0,0.2,1)}
   @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
   .sheet-header{padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
   .sheet-content{padding:16px;overflow-y:auto;flex:1}
+
+  /* CUSTOM CONFIRM MODAL */
+  .custom-modal{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,0.8);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:20px}
+  .custom-modal.open{display:flex}
+  .custom-modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:20px;width:100%;max-width:320px;text-align:center}
+  .custom-modal-box h3{font-size:16px;margin-bottom:8px}
+  .custom-modal-box p{font-size:13px;color:var(--muted);margin-bottom:20px}
+  .custom-modal-btns{display:flex;gap:10px}
 
   /* PROGRESS BAR */
   .prog-wrap{margin:15px 0}
@@ -168,7 +173,19 @@
 
 <div id="app-loader">
   <div class="spinner"></div>
-  <p style="font-size:13px; color:var(--muted)">VidUnlock লোড হচ্ছে...</p>
+  <p style="font-size:13px; color:var(--muted)">লোড হচ্ছে...</p>
+</div>
+
+<!-- Custom Confirmation Modal (Replaces native confirm()) -->
+<div class="custom-modal" id="custom-confirm-modal">
+  <div class="custom-modal-box">
+    <h3 id="cc-title">নিশ্চিত করুন</h3>
+    <p id="cc-message">আপনি কি এটি করতে চান?</p>
+    <div class="custom-modal-btns">
+      <button class="btn btn-g" id="cc-cancel-btn">না</button>
+      <button class="btn btn-p" id="cc-ok-btn">হ্যাঁ</button>
+    </div>
+  </div>
 </div>
 
 <header class="app-header">
@@ -273,9 +290,8 @@
       <div class="form-group"><label>শিরোনাম</label><input id="av-title" type="text"/></div>
       <div class="form-group"><label>ক্যাটাগরি</label><select id="av-cat"></select></div>
       <div class="form-group">
-        <label>থাম্বনেইল</label>
-        <input accept="image/*" onchange="previewFile(this, 'av-thumb-prev')" type="file"/>
-        <div class="thumb-prev" id="av-thumb-prev"><span>Preview</span></div>
+        <label>থাম্বনেইল ফাইল</label>
+        <input accept="image/*" id="av-thumb-file" type="file"/>
       </div>
       <div class="form-group">
         <label>📁 ভিডিও ফাইল সিলেক্ট করুন</label>
@@ -292,7 +308,8 @@
   <div class="admin-subview hidden" id="admin-cats">
     <div class="admin-card">
       <h4>➕ নতুন ক্যাটাগরি</h4>
-      <div class="form-group"><label>নাম</label><input id="ac-name" type="text"/></div>
+      <div class="form-group"><label>নাম (English)</label><input id="ac-name-en" type="text"/></div>
+      <div class="form-group"><label>নাম (বাংলা)</label><input id="ac-name-bn" type="text"/></div>
       <div class="form-group"><label>ইমোজি/আইকন</label><input id="ac-icon" placeholder="🔥" type="text"/></div>
       <button class="btn btn-p" onclick="saveCategory()">সেভ ক্যাটাগরি</button>
     </div>
@@ -374,7 +391,7 @@
 
 <script>
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "VidUnlock_Core_State_V7";
+const STORE_KEY = "VidUnlock_Core_State_V8";
 const BUCKET_NAME = "Viral Video"; 
 
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
@@ -453,11 +470,11 @@ const i18n = {
 };
 
 let state = {
-  version: 7,
+  version: 8,
   lang: 'bn',
   categories: [
-    { id: 'cat_all', name: 'সব', icon: '✨', order: 0 },
-    { id: 'cat_viral', name: 'ভাইরাল', icon: '🔥', order: 1 }
+    { id: 'cat_all', name: { bn: 'সব', en: 'All' }, icon: '✨', order: 0 },
+    { id: 'cat_viral', name: { bn: 'ভাইরাল', en: 'Viral' }, icon: '🔥', order: 1 }
   ],
   videos: [],
   viralLinks: [],
@@ -466,10 +483,8 @@ let state = {
   favorites: {},
   reactions: {},
   comments: {},
-  recent: [],
   adViews: 0,
-  users: {},
-  settings: { maintenance: false }
+  users: {}
 };
 
 let tg = window.Telegram.WebApp || {};
@@ -477,6 +492,31 @@ let user = tg.initDataUnsafe?.user || { id: 123456, first_name: 'Guest' };
 let currentCat = 'cat_all';
 let isAdShowing = false;
 let currentActiveVid = null;
+
+// Custom Confirm Helper (replaces native confirm)
+function showCustomConfirm(title, message, onConfirm) {
+  const modal = document.getElementById('custom-confirm-modal');
+  document.getElementById('cc-title').textContent = title;
+  document.getElementById('cc-message').textContent = message;
+  modal.classList.add('open');
+
+  const okBtn = document.getElementById('cc-ok-btn');
+  const cancelBtn = document.getElementById('cc-cancel-btn');
+
+  const cleanup = () => {
+    modal.classList.remove('open');
+    okBtn.onclick = null;
+    cancelBtn.onclick = null;
+  };
+
+  okBtn.onclick = () => {
+    cleanup();
+    onConfirm();
+  };
+  cancelBtn.onclick = () => {
+    cleanup();
+  };
+}
 
 async function initApp() {
   if (tg.ready) tg.ready();
@@ -490,23 +530,39 @@ async function initApp() {
     } catch(e) {}
   }
 
-  if (supabaseClient) {
-    try {
-      const { data: dbVids } = await supabaseClient.from('videos').select('*');
-      if (dbVids) state.videos = dbVids;
+  // Timeout wrapper for Supabase loading
+  const loadFromSupabase = async () => {
+    if (!supabaseClient) return;
+    const { data: dbVids } = await supabaseClient.from('videos').select('*');
+    if (dbVids) state.videos = dbVids;
 
-      const { data: dbCats } = await supabaseClient.from('categories').select('*');
-      if (dbCats && dbCats.length > 0) {
-        state.categories = [{ id: 'cat_all', name: 'সব', icon: '✨', order: 0 }, ...dbCats.filter(c => c.id !== 'cat_all')];
-      }
-
-      const { data: dbViral } = await supabaseClient.from('viral_links').select('*');
-      if (dbViral) state.viralLinks = dbViral;
-    } catch (err) {
-      console.error("Supabase sync failed, using local storage", err);
+    const { data: dbCats } = await supabaseClient.from('categories').select('*');
+    if (dbCats && dbCats.length > 0) {
+      state.categories = [
+        { id: 'cat_all', name: { bn: 'সব', en: 'All' }, icon: '✨', order: 0 }, 
+        ...dbCats.filter(c => c.id !== 'cat_all')
+      ];
     }
+
+    const { data: dbViral } = await supabaseClient.from('viral_links').select('*');
+    if (dbViral) state.viralLinks = dbViral;
+
+    // Load User specific states if synced
+    if (user && user.id) {
+      state.users[user.id] = { name: user.first_name, lastSeen: new Date().toISOString() };
+    }
+  };
+
+  try {
+    await Promise.race([
+      loadFromSupabase(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+    ]);
+  } catch (err) {
+    console.warn("Supabase load timeout or failed, running offline/local data.");
   }
 
+  // Robust Admin check (Telegram ID validation)
   if (Number(user.id) === ADMIN_ID) {
     const navAdmin = document.getElementById('nav-admin');
     if(navAdmin) navAdmin.classList.remove('hidden');
@@ -531,6 +587,8 @@ function toggleLanguage() {
   state.lang = state.lang === 'bn' ? 'en' : 'bn';
   saveState();
   applyLanguage();
+  renderCategories();
+  renderAll();
 }
 
 function applyLanguage() {
@@ -556,19 +614,27 @@ function applyLanguage() {
   if(heroWelcome) heroWelcome.textContent = currentLang === 'bn' ? `হ্যালো! 👋` : `Hello! 👋`;
 }
 
+function getCategoryName(c) {
+  if (!c || !c.name) return '';
+  if (typeof c.name === 'object') {
+    return c.name[state.lang] || c.name['bn'] || '';
+  }
+  return c.name;
+}
+
 function renderCategories() {
   const container = document.getElementById('category-tabs');
   if(container) {
     container.innerHTML = state.categories.map(c => `
       <button class="tab ${currentCat === c.id ? 'active' : ''}" onclick="switchCat('${c.id}')">
-        ${c.icon} ${c.name}
+        ${c.icon} ${getCategoryName(c)}
       </button>
     `).join('');
   }
   
   const select = document.getElementById('av-cat');
   if(select) {
-    select.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    select.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `<option value="${c.id}">${getCategoryName(c)}</option>`).join('');
   }
 }
 
@@ -577,12 +643,13 @@ function createVideoCard(v) {
   const isFav = state.favorites[v.id];
   const viewsCount = v.views ? (typeof v.views === 'object' ? Object.keys(v.views).length : 0) : 0;
   const catObj = state.categories.find(c => c.id === v.category_id || c.id === v.categoryId);
-  const catName = catObj ? catObj.name : '';
+  const catName = catObj ? getCategoryName(catObj) : '';
+  const thumbSrc = v.thumb || 'https://via.placeholder.com/320x180?text=No+Thumbnail';
 
   return `
     <div class="card" onclick="openDetail('${v.id}')">
       <div class="card-thumb">
-        <img src="${v.thumb || ''}" loading="lazy"/>
+        <img src="${thumbSrc}" loading="lazy" onerror="this.src='https://via.placeholder.com/320x180?text=No+Thumbnail'"/>
         <div class="card-badge ${isUnlocked ? 'badge-unlocked' : 'badge-locked'}">
           ${isUnlocked ? (state.lang==='bn'?'🔓 আনলক':'🔓 Unlocked') : (state.lang==='bn'?'🔒 লক':'🔒 Locked')}
         </div>
@@ -590,7 +657,7 @@ function createVideoCard(v) {
       </div>
       <div class="card-body">
         <div class="card-cat">${catName}</div>
-        <div class="card-title">${v.title}</div>
+        <div class="card-title">${escapeHtml(v.title)}</div>
         <div class="card-footer">
           <span>👁 ${viewsCount} views</span>
           <span>${isFav ? '❤️' : '🤍'}</span>
@@ -612,10 +679,20 @@ function renderAll() {
 function renderHome() {
   const grid = document.getElementById('main-grid');
   if(!grid) return;
+  const searchInput = document.getElementById('main-search');
+  const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
   let vids = state.videos;
+  
+  // Category Filter fix combined with Search
   if (currentCat !== 'cat_all') {
     vids = vids.filter(v => (v.category_id === currentCat || v.categoryId === currentCat));
   }
+  
+  if (q) {
+    vids = vids.filter(v => v.title.toLowerCase().includes(q));
+  }
+
   grid.innerHTML = vids.length ? vids.map(createVideoCard).join('') : '<div class="empty-state"><i>📹</i>কোন ভিডিও পাওয়া যায়নি</div>';
 }
 
@@ -648,8 +725,8 @@ function renderViralLinks() {
       <div class="viral-info">
         <div class="viral-icon">🔥</div>
         <div>
-          <div class="viral-title">${l.title}</div>
-          <div class="viral-url">${l.url}</div>
+          <div class="viral-title">${escapeHtml(l.title)}</div>
+          <div class="viral-url">${escapeHtml(l.url)}</div>
         </div>
       </div>
       <button class="btn btn-s" style="width:auto;padding:8px 14px;font-size:12px" onclick="watchExternal('${l.url}')">
@@ -705,7 +782,7 @@ async function updateDetailUI(v) {
     if (isUnlocked && v.link) {
       mediaCont.innerHTML = `<video src="${v.link}" controls style="width:100%;height:100%"></video>`;
     } else {
-      mediaCont.innerHTML = `<img src="${v.thumb || ''}" style="width:100%;height:100%;object-fit:cover"/>`;
+      mediaCont.innerHTML = `<img src="${v.thumb || 'https://via.placeholder.com/320x180?text=No+Thumbnail'}" style="width:100%;height:100%;object-fit:cover"/>`;
     }
   }
 
@@ -745,18 +822,15 @@ function toggleReaction() {
   updateDetailUI(currentActiveVid);
 }
 
-// ঠিক করা হয়েছে: Monetag/Libtl অ্যাড সফলভাবে দেখার পর ট্রিগার নিশ্চিত করা
 async function watchAd() {
   if (isAdShowing) return;
   const v = currentActiveVid;
   const btn = document.getElementById('ad-btn');
 
   if (typeof show_11458857 !== 'function') {
-    showToast("Ad SDK loading or blocked. Try again.", "warning");
-    // যদি কোনো কারণে SDK লোড না হয় বা টেস্টিংয়ের সময় ফলব্যাক হিসেবে সরাসরি আনলক সুবিধা রাখা হলো:
-    if (confirm("অ্যাড লোড হয়নি। সরাসরি আনলক করতে চান?")) {
+    showCustomConfirm("বিজ্ঞাপন", "অ্যাড SDK লোড হয়নি। সরাসরি টেস্ট আনলক করতে চান?", () => {
       handleAdSuccess(v.id);
-    }
+    });
     return;
   }
 
@@ -764,7 +838,6 @@ async function watchAd() {
   if(btn) btn.disabled = true;
 
   try {
-    // Monetag SDK ফাংশন সাধারণত সফলভাবে সমাপ্ত হলে রেজলভ হয় অথবা প্রমিজ রিটার্ন করে
     await show_11458857(); 
     handleAdSuccess(v.id);
   } catch (err) {
@@ -811,11 +884,10 @@ function watchExternal(link) {
 }
 
 async function saveVideo() {
-  const title = document.getElementById('av-title').value;
+  const title = document.getElementById('av-title').value.trim();
   const catId = document.getElementById('av-cat').value;
   const ads = parseInt(document.getElementById('av-ads').value) || 1;
-  const thumbPrev = document.getElementById('av-thumb-prev');
-  const thumbBase64 = thumbPrev ? thumbPrev._data : '';
+  const thumbFile = document.getElementById('av-thumb-file').files[0];
   const fileInput = document.getElementById('av-file');
   const uploadBtn = document.getElementById('upload-btn');
 
@@ -829,18 +901,32 @@ async function saveVideo() {
 
   try {
     const videoFile = fileInput.files[0];
-    const fileName = `video_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${videoFile.name.split('.').pop()}`;
+    const uniqueSuffix = Date.now() + '_' + Math.random().toString(36).substring(2, 7);
+    const videoFileName = `video_${uniqueSuffix}.${videoFile.name.split('.').pop()}`;
+
+    let thumbPublicUrl = 'https://via.placeholder.com/320x180?text=No+Thumbnail';
 
     if (supabaseClient) {
+      // Upload Thumbnail if provided to Cloud Storage
+      if (thumbFile) {
+        const thumbFileName = `thumb_${uniqueSuffix}.${thumbFile.name.split('.').pop()}`;
+        const { error: thumbErr } = await supabaseClient.storage.from(BUCKET_NAME).upload(thumbFileName, thumbFile);
+        if (!thumbErr) {
+          const { data: tUrlData } = supabaseClient.storage.from(BUCKET_NAME).getPublicUrl(thumbFileName);
+          thumbPublicUrl = tUrlData.publicUrl;
+        }
+      }
+
+      // Upload Video File to Cloud Storage
       const { error: uploadError } = await supabaseClient.storage
         .from(BUCKET_NAME)
-        .upload(fileName, videoFile);
+        .upload(videoFileName, videoFile);
 
       if (uploadError) throw uploadError;
 
       const { data: publicUrlData } = supabaseClient.storage
         .from(BUCKET_NAME)
-        .getPublicUrl(fileName);
+        .getPublicUrl(videoFileName);
 
       const videoPublicUrl = publicUrlData.publicUrl;
       const vidId = 'v' + Date.now();
@@ -852,7 +938,7 @@ async function saveVideo() {
         source: 'file', 
         link: videoPublicUrl,
         required_ads: ads, 
-        thumb: thumbBase64 || '', 
+        thumb: thumbPublicUrl, 
         views: {}
       };
 
@@ -866,14 +952,11 @@ async function saveVideo() {
     
     document.getElementById('av-title').value = '';
     document.getElementById('av-file').value = '';
-    if(thumbPrev) {
-      thumbPrev.innerHTML = '<span>Preview</span>';
-      thumbPrev._data = null;
-    }
+    document.getElementById('av-thumb-file').value = '';
 
   } catch (err) {
     console.error("Upload error:", err);
-    showToast("আপলোড ব্যর্থ হয়েছে! Supabase Storage-এ সঠিক বাকেট পলিসি চেক করুন।", "danger");
+    showToast("আপলোড ব্যর্থ হয়েছে! ডুপ্লিকেট ফাইল নেম বা স্টোরেজ পলিসি চেক করুন।", "danger");
   } finally {
     if(uploadBtn) {
       uploadBtn.disabled = false;
@@ -883,25 +966,50 @@ async function saveVideo() {
 }
 
 async function deleteVideo(id) {
-  if (!confirm("ডিলিট করতে চান?")) return;
-  if (supabaseClient) {
-    try { await supabaseClient.from('videos').delete().eq('id', id); } catch (err) {}
-  }
-  state.videos = state.videos.filter(v => v.id !== id);
-  saveState();
-  renderAll();
-  showToast("ভিডিও ডিলিট হয়েছে! 🗑️", "success");
+  showCustomConfirm("ডিলিট", "আপনি কি এই ভিডিওটি ডিলিট করতে চান?", async () => {
+    const v = state.videos.find(x => x.id === id);
+    if (v && v.link && supabaseClient) {
+      try {
+        // Extract file path from Supabase Public URL for complete cleanup
+        const urlObj = new URL(v.link);
+        const pathParts = urlObj.pathname.split('/');
+        const fileName = pathParts[pathParts.length - 1];
+        if (fileName) {
+          await supabaseClient.storage.from(BUCKET_NAME).remove([fileName]);
+        }
+      } catch (e) {
+        console.error("Storage file deletion error:", e);
+      }
+    }
+
+    if (supabaseClient) {
+      try { await supabaseClient.from('videos').delete().eq('id', id); } catch (err) {}
+    }
+    state.videos = state.videos.filter(item => item.id !== id);
+    saveState();
+    renderAll();
+    showToast("ভিডিও সফলভাবে ডিলিট হয়েছে! 🗑️", "success");
+  });
 }
 
 async function saveCategory() {
-  const nameInput = document.getElementById('ac-name');
+  const nameEnInput = document.getElementById('ac-name-en');
+  const nameBnInput = document.getElementById('ac-name-bn');
   const iconInput = document.getElementById('ac-icon');
-  const name = nameInput ? nameInput.value : '';
-  const icon = iconInput ? iconInput.value || '📁' : '📁';
-  if(!name) return showToast("ক্যাটাগরির নাম দিন");
+  
+  const nameEn = nameEnInput ? nameEnInput.value.trim() : '';
+  const nameBn = nameBnInput ? nameBnInput.value.trim() : '';
+  const icon = iconInput ? iconInput.value.trim() || '📁' : '📁';
+
+  if(!nameEn || !nameBn) return showToast("ইংরেজি ও বাংলা উভয় নাম দিন");
   
   const catId = 'cat_' + Date.now();
-  const catData = { id: catId, name, icon, order: state.categories.length };
+  const catData = { 
+    id: catId, 
+    name: { bn: nameBn, en: nameEn }, 
+    icon, 
+    order: state.categories.length 
+  };
   
   if (supabaseClient) {
     try { await supabaseClient.from('categories').insert([catData]); } catch(e) {}
@@ -911,22 +1019,30 @@ async function saveCategory() {
   saveState();
   renderCategories();
   showToast("ক্যাটাগরি সেভ হয়েছে! ✅", "success");
-  if(nameInput) nameInput.value = '';
+  
+  if(nameEnInput) nameEnInput.value = '';
+  if(nameBnInput) nameBnInput.value = '';
   if(iconInput) iconInput.value = '';
 }
 
 async function saveViralLink() {
   const titleInput = document.getElementById('avl-title');
   const urlInput = document.getElementById('avl-url');
-  const title = titleInput ? titleInput.value : '';
-  const url = urlInput ? urlInput.value : '';
+  const title = titleInput ? titleInput.value.trim() : '';
+  const url = urlInput ? urlInput.value.trim() : '';
 
   if (!title || !url) return showToast("টাইটেল এবং লিংক ইউআরএল প্রবেশ করুন");
 
   const linkData = { id: 'vl_' + Date.now(), title, url };
 
   if (supabaseClient) {
-    try { await supabaseClient.from('viral_links').insert([linkData]); } catch (err) {}
+    try { 
+      const { error } = await supabaseClient.from('viral_links').insert([linkData]);
+      if (error) throw error;
+    } catch (err) {
+      showToast("ডাটাবেজে সেভ করতে সমস্যা হয়েছে!", "danger");
+      return;
+    }
   }
 
   if (!state.viralLinks) state.viralLinks = [];
@@ -940,16 +1056,16 @@ async function saveViralLink() {
 }
 
 async function deleteViralLink(id) {
-  if (!confirm("ভাইরাল লিংকটি ডিলিট করতে চান?")) return;
-  
-  if (supabaseClient) {
-    try { await supabaseClient.from('viral_links').delete().eq('id', id); } catch (err) {}
-  }
+  showCustomConfirm("ডিলিট", "ভাইরাল লিংকটি ডিলিট করতে চান?", async () => {
+    if (supabaseClient) {
+      try { await supabaseClient.from('viral_links').delete().eq('id', id); } catch (err) {}
+    }
 
-  state.viralLinks = state.viralLinks.filter(l => l.id !== id);
-  saveState();
-  renderAll();
-  showToast("ভাইরাল লিংক ডিলিট হয়েছে! 🗑️", "success");
+    state.viralLinks = state.viralLinks.filter(l => l.id !== id);
+    saveState();
+    renderAll();
+    showToast("ভাইরাল লিংক ডিলিট হয়েছে! 🗑️", "success");
+  });
 }
 
 function renderAdmin() {
@@ -966,8 +1082,8 @@ function renderAdmin() {
     vidListCont.innerHTML = state.videos.length ? state.videos.map(v => `
       <div class="admin-list-item">
         <div class="admin-list-info">
-          <img src="${v.thumb || ''}" class="admin-list-thumb"/>
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${v.title}</div>
+          <img src="${v.thumb || ''}" class="admin-list-thumb" onerror="this.src='https://via.placeholder.com/40'"/>
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">${escapeHtml(v.title)}</div>
         </div>
         <button class="btn btn-d" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteVideo('${v.id}')">ডিলিট</button>
       </div>
@@ -978,7 +1094,7 @@ function renderAdmin() {
   if (catListCont) {
     catListCont.innerHTML = state.categories.filter(c => c.id !== 'cat_all').map(c => `
       <div class="admin-list-item">
-        <div style="font-size:12px;font-weight:600">${c.icon} ${c.name}</div>
+        <div style="font-size:12px;font-weight:600">${c.icon} ${getCategoryName(c)}</div>
       </div>
     `).join('');
   }
@@ -991,8 +1107,8 @@ function renderAdmin() {
         <div class="admin-list-info">
           <div style="font-size:16px">🔥</div>
           <div>
-            <div style="font-size:12px;font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.title}</div>
-            <div style="font-size:10px;color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.url}</div>
+            <div style="font-size:12px;font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(l.title)}</div>
+            <div style="font-size:10px;color:var(--muted);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(l.url)}</div>
           </div>
         </div>
         <button class="btn btn-d" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteViralLink('${l.id}')">ডিলিট</button>
@@ -1034,12 +1150,7 @@ function switchCat(id) {
 }
 
 function handleSearch() {
-  const searchInput = document.getElementById('main-search');
-  const q = searchInput ? searchInput.value.toLowerCase() : '';
-  const grid = document.getElementById('main-grid');
-  if(!grid) return;
-  const filtered = state.videos.filter(v => v.title.toLowerCase().includes(q));
-  grid.innerHTML = filtered.map(createVideoCard).join('');
+  renderHome();
 }
 
 function toggleFav(id) {
@@ -1053,7 +1164,7 @@ function showToast(msg, type = 'info') {
   if(!cont) return;
   const toast = document.createElement('div');
   toast.className = `toast`;
-  toast.innerHTML = `<span>${type === 'success' ? '✅' : 'ℹ️'}</span> ${msg}`;
+  toast.innerHTML = `<span>${type === 'success' ? '✅' : 'ℹ️'}</span> ${escapeHtml(msg)}`;
   cont.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
@@ -1073,24 +1184,21 @@ function updateStats() {
   setEl('stat-fav-v', Object.keys(state.favorites).filter(k => state.favorites[k]).length);
 }
 
-function previewFile(input, targetId) {
-  const file = input.files[0];
-  const target = document.getElementById(targetId);
-  if (file && target) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      target.innerHTML = `<img src="${e.target.result}"/>`;
-      target._data = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-}
-
 function closeModal(id) {
   const modal = document.getElementById(id);
   if(modal) modal.classList.remove('open');
   const mediaCont = document.getElementById('md-media-container');
   if(mediaCont) mediaCont.innerHTML = '';
+}
+
+// XSS Protection Utility
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/&/g, "&amp;")
+             .replace(/</g, "&lt;")
+             .replace(/>/g, "&gt;")
+             .replace(/"/g, "&quot;")
+             .replace(/'/g, "&#039;");
 }
 
 function renderComments(vidId) {
@@ -1099,42 +1207,70 @@ function renderComments(vidId) {
   const list = state.comments[vidId] || [];
   cont.innerHTML = list.map(c => `
     <div class="comment-item">
-      <div class="comment-meta"><span>${c.user}</span><span>Just now</span></div>
-      <div style="font-size:12px">${c.text}</div>
+      <div class="comment-meta"><span>${escapeHtml(c.user)}</span><span>Just now</span></div>
+      <div style="font-size:12px">${escapeHtml(c.text)}</div>
     </div>
   `).join('');
 }
 
 function postComment() {
   const input = document.getElementById('md-comment-input');
-  if(!input || !input.value || !currentActiveVid) return;
+  if(!input || !input.value.trim() || !currentActiveVid) return;
   if(!state.comments[currentActiveVid.id]) state.comments[currentActiveVid.id] = [];
-  state.comments[currentActiveVid.id].unshift({ user: user.first_name, text: input.value });
+  state.comments[currentActiveVid.id].unshift({ user: user.first_name || 'User', text: input.value.trim() });
   input.value = '';
   saveState();
   renderComments(currentActiveVid.id);
 }
 
 function exportData() {
-  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  // Export user-specific data isolation to prevent mixups
+  const exportPayload = {
+    unlocked: state.unlocked,
+    progress: state.progress,
+    favorites: state.favorites,
+    reactions: state.reactions
+  };
+  const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'backup.json';
+  a.download = 'user_backup.json';
   a.click();
 }
 
+// Fixed Missing importData Function
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.unlocked) state.unlocked = { ...state.unlocked, ...imported.unlocked };
+      if (imported.favorites) state.favorites = { ...state.favorites, ...imported.favorites };
+      if (imported.progress) state.progress = { ...state.progress, ...imported.progress };
+      saveState();
+      renderAll();
+      showToast("ব্যাকআপ সফলভাবে রিস্টোর হয়েছে! ✅", "success");
+    } catch (err) {
+      showToast("ভুল ফরম্যাটের ব্যাকআপ ফাইল!", "danger");
+    }
+  };
+  reader.readAsText(file);
+}
+
 function clearAppData() {
-  if (confirm("Clear everything?")) {
+  showCustomConfirm("সতর্কতা", "সব ডাটা মুছে ফেলতে চান?", () => {
     localStorage.clear();
     location.reload();
-  }
+  });
 }
 
 function shareVideo() {
   if (tg.switchInlineQuery) {
     tg.switchInlineQuery("Check out this awesome video!");
   } else {
-    showToast("Share feature requires Telegram WebApp", "info");
+    showToast("শেয়ার ফিচারটি টেলিগ্রাম অ্যাপে কাজ করে", "info");
   }
 }
 
