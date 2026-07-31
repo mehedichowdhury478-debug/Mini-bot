@@ -369,8 +369,10 @@
       <button onclick="closeModal('modal-detail')" style="background:none;border:none;font-size:22px;color:#fff;cursor:pointer">✕</button>
       <div style="font-weight:700;font-size:14px">ভিডিও প্লেয়ার</div>
       <div style="display:flex;gap:15px;align-items:center">
-        <button id="md-react-btn" onclick="toggleReaction()" style="background:none;border:none;font-size:18px;cursor:pointer">❤️ <span id="md-react-count">0</span></button>
-        <button id="md-fav-btn" style="background:none;border:none;font-size:20px;cursor:pointer">🤍</button>
+        <!-- লাইক বাটন (গোলাপি রঙ) -->
+        <button id="md-react-btn" onclick="toggleReaction()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--primary);font-weight:700">❤️ <span id="md-react-count">0</span></button>
+        <!-- ফেভারিট বাটন (লাল/অন্য রঙ) -->
+        <button id="md-fav-btn" style="background:none;border:none;font-size:20px;cursor:pointer;color:#ef4444">🤍</button>
       </div>
     </div>
     <div class="sheet-body">
@@ -417,7 +419,7 @@ function hideLoader() {
 setTimeout(hideLoader, 800);
 
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "ViralVideo_App_V7";
+const STORE_KEY = "ViralVideo_App_V8";
 const BUCKET_NAME = "Viral Video";
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -479,7 +481,7 @@ function showCustomConfirm(title, message, onConfirm) {
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
-    showToast('কপি করা হয়েছে: ' + text, 'success');
+    showToast('কপি করা হয়েছে!', 'success');
   }).catch(() => {
     showToast('কপি করা সম্ভব হয়নি!', 'danger');
   });
@@ -632,7 +634,7 @@ function createCard(v) {
     '<div class="card-details">' +
       '<div style="margin-bottom:4px"><span class="card-tag">' + catName + '</span></div>' +
       '<div class="card-heading">' + escapeHtml(v.title) + '</div>' +
-      '<div class="card-meta"><span>👁 ' + views + '</span><span>' + (isFav ? '❤️' : '🤍') + '</span></div>' +
+      '<div class="card-meta"><span>👁 ' + views + '</span><span style="color:#ef4444">' + (isFav ? '❤️' : '🤍') + '</span></div>' +
     '</div></div>';
 }
 
@@ -747,7 +749,8 @@ function quickActionShare() {
   if (!longPressVidId) return;
   const v = state.videos.find(x => x.id === longPressVidId);
   if (v) {
-    const shareText = (v.title || '') + '\n' + (v.link || '');
+    const botUsername = "viraIvideorobot";
+    const shareText = `🔥 নতুন ভিডিও আপলোড হয়েছে!\n🎬 ${v.title}\n\n👇 এখনই দেখুন:\nhttps://t.me/${botUsername}?startapp=${v.id}`;
     copyToClipboard(shareText);
   }
   closeModal('modal-quick');
@@ -794,11 +797,12 @@ function updateModalUI(v) {
 
   const favBtn = document.getElementById('md-fav-btn');
   favBtn.textContent = state.favorites[v.id] ? '❤️' : '🤍';
+  favBtn.style.color = '#ef4444';
   favBtn.onclick = function() { toggleFav(v.id); updateModalUI(v); };
 
   if (!state.reactions[v.id]) state.reactions[v.id] = [];
   const reacted = state.reactions[v.id].indexOf(user.id) > -1;
-  document.getElementById('md-react-btn').style.color = reacted ? 'var(--primary)' : 'inherit';
+  document.getElementById('md-react-btn').style.color = reacted ? 'var(--primary)' : '#fff';
   document.getElementById('md-react-count').textContent = state.reactions[v.id].length;
 
   const media = document.getElementById('md-media-container');
@@ -840,13 +844,16 @@ async function watchAd() {
 
   isAdShowing = true;
   try {
+    // অপেক্ষা করা হচ্ছে যতক্ষণ না বিজ্ঞাপন সম্পূর্ণ শেষ হয়
     const result = show_11458857();
     if (result && typeof result.then === 'function') {
       await result;
     }
+    // বিজ্ঞাপনের প্রমিজ সম্পূর্ণ হওয়ার পরেই কেবল কাউন্ট বাড়াবে
     handleAdSuccess(v.id);
   } catch(e) {
-    handleAdSuccess(v.id);
+    // কোনো কারণে এরর হলে কাউন্ট বা প্রোগ্রেস আপডেট হবে না
+    showToast('বিজ্ঞাপন সম্পন্ন হয়নি!', 'danger');
   } finally {
     isAdShowing = false;
   }
@@ -1267,7 +1274,8 @@ async function postComment() {
 
 function shareVideo() {
   if (currentActiveVid) {
-    const shareText = (currentActiveVid.title || '') + '\n' + (currentActiveVid.link || '');
+    const botUsername = "viraIvideorobot";
+    const shareText = `🔥 নতুন ভিডিও আপলোড হয়েছে!\n🎬 ${currentActiveVid.title}\n\n👇 এখনই দেখুন:\nhttps://t.me/${botUsername}?startapp=${currentActiveVid.id}`;
     copyToClipboard(shareText);
   } else if (tg.switchInlineQuery) {
     tg.switchInlineQuery('Check out this video!');
