@@ -1,560 +1,113 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>ভাইরাল ভিডিও</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root {
-      --bg: #0b0e14;
-      --surface: #131824;
-      --surface-light: #1d2638;
-      --border: rgba(255,255,255,0.06);
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --primary: #ec4899;
-      --primary-glow: rgba(236,72,153,0.3);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-      --radius: 20px;
-    }
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    body { padding-bottom: 100px; }
-
-    /* Loader */
-    #app-loader {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      transition: opacity 0.3s;
-    }
-    #app-loader.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .spinner {
-      width: 44px;
-      height: 44px;
-      border: 3px solid var(--surface-light);
-      border-top: 3px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Top User Box */
-    .top-user-box {
-      margin: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .tu-left h1 {
-      font-size: 20px;
-      font-weight: 800;
-      background: linear-gradient(135deg, #fff 0%, #ec4899 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .tu-right { display: flex; align-items: center; gap: 12px; }
-    .welcome-wrap { text-align: right; }
-    .welcome-name { font-size: 13px; font-weight: 700; }
-    .welcome-id { font-size: 11px; color: var(--muted); }
-    .tu-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: var(--gradient);
-      display: grid;
-      place-items: center;
-      font-size: 15px;
-      font-weight: 800;
-      overflow: hidden;
-    }
-    .tu-avatar img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* Search */
-    .search-wrap { padding: 0 16px 14px; }
-    .search-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 12px 18px;
-      border-radius: var(--radius);
-    }
-    .search-box input {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 14px;
-      width: 100%;
-      outline: none;
-      font-family: inherit;
-    }
-    .search-box button {
-      background: var(--gradient);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    /* Category */
-    .cat-scroll {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 0 16px 14px;
-      scrollbar-width: none;
-    }
-    .cat-scroll::-webkit-scrollbar { display: none; }
-    .cat-pill {
-      padding: 8px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      cursor: pointer;
-      color: var(--muted);
-    }
-    .cat-pill.active {
-      background: var(--gradient);
-      border-color: transparent;
-      color: #fff;
-    }
-
-    /* Views */
-    .view { display: none; padding: 0 16px; }
-    .view.active { display: block; }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 800;
-      margin: 8px 0 12px;
-      color: var(--primary);
-    }
-
-    /* Video Grid */
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    .video-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: pointer;
-    }
-    .thumb-wrap {
-      aspect-ratio: 4/3;
-      position: relative;
-      background: #000;
-    }
-    .thumb-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .status-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 9px;
-      font-weight: 700;
-    }
-    .badge-lock { background: rgba(0,0,0,0.65); color: var(--warning); }
-    .badge-unlock { background: rgba(16,185,129,0.85); color: #fff; }
-    .play-overlay {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(0,0,0,0.22);
-    }
-    .play-icon {
-      width: 38px;
-      height: 38px;
-      background: rgba(255,255,255,0.25);
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      color: #fff;
-    }
-    .card-details { padding: 10px; }
-    .card-heading {
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.35;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      height: 32px;
-    }
-    .card-meta {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .card-tag {
-      background: rgba(236,72,153,0.15);
-      color: var(--primary);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-weight: 700;
-      font-size: 9px;
-    }
-
-    /* Empty State */
-    .empty-state {
-      grid-column: 1 / -1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      min-height: 300px;
-      padding: 40px 20px;
-    }
-    .empty-icon { font-size: 72px; margin-bottom: 16px; }
-    .empty-text { font-size: 16px; font-weight: 600; color: var(--muted); }
-
-    /* Profile */
-    .profile-cover {
-      height: 120px;
-      background: var(--gradient);
-      border-radius: 24px 24px 0 0;
-      margin-bottom: -45px;
-    }
-    .profile-identity-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 0 20px 24px;
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
-    }
-    .profile-avatar-box {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: var(--surface);
-      margin: 0 auto 14px;
-      padding: 3px;
-      position: relative;
-      top: -45px;
-    }
-    .profile-avatar-box img,
-    .profile-avatar-box .fallback-avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      background: var(--surface-light);
-      color: #fff;
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      font-weight: 800;
-    }
-    .profile-name {
-      font-size: 19px;
-      font-weight: 800;
-      margin-top: -35px;
-      margin-bottom: 4px;
-    }
-    .profile-username {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-    .profile-id-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      padding: 7px 16px;
-      border-radius: 30px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .profile-menu-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-    .profile-menu-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-    }
-    .profile-menu-item:last-child { border-bottom: none; }
-    .menu-item-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    /* Links */
-    .viral-link-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .v-info { display: flex; align-items: center; gap: 14px; overflow: hidden; }
-    .v-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: var(--surface-light);
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      color: var(--primary);
-    }
-    .v-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .v-url { font-size: 11px; color: var(--muted); }
-
-    /* Bottom Nav */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(11,14,20,0.97);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 4px calc(10px + env(safe-area-inset-bottom));
-      z-index: 150;
-    }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      color: #6b7280 !important;
-      font-size: 11px;
-      font-weight: 600;
-      flex: 1;
-      background: transparent !important;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-      padding: 6px 0;
-      position: relative;
-    }
-    .nav-btn.active { color: #ec4899 !important; }
-    .nav-btn.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 18px;
-      height: 3px;
-      background: var(--primary);
-      border-radius: 3px;
-    }
-    .nav-btn i { font-size: 22px; font-style: normal; line-height: 1; color: inherit !important; }
-    .nav-btn span { color: inherit !important; }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 300;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      align-items: flex-end;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-sheet {
-      background: var(--bg);
-      width: 100%;
-      max-height: 92vh;
-      border-radius: 32px 32px 0 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-    }
-    .sheet-top {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-    }
-    .sheet-body { padding: 20px; overflow-y: auto; flex: 1; }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 12px 20px;
-      border-radius: 14px;
-      font-weight: 700;
-      font-size: 14px;
-      width: 100%;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-primary { background: var(--gradient); }
-    .btn-success { background: var(--success); }
-    .btn-ghost { background: var(--surface-light); border: 1px solid var(--border); }
-    .btn-danger { background: var(--danger); }
-
-    .form-group { margin-bottom: 14px; }
-    .form-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 6px;
-      color: var(--muted);
-    }
-    .form-group input, .form-group select {
-      width: 100%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 12px;
-      border-radius: 14px;
-      color: #fff;
-      font-family: inherit;
-      font-size: 13px;
-      outline: none;
-    }
-
-    .admin-panel-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 18px;
-      border-radius: 20px;
-      margin-bottom: 16px;
-    }
-    .admin-list-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--surface-light);
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 14px;
-      margin-bottom: 8px;
-      gap: 8px;
-    }
-
-    .progress-wrap { margin: 15px 0; }
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 6px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .progress-bar-track {
-      height: 8px;
-      background: var(--surface-light);
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--gradient);
-      border-radius: 10px;
-      transition: 0.4s;
-      width: 0%;
-    }
-
-    #toast-box {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 4000;
-      width: 90%;
-      max-width: 380px;
-      pointer-events: none;
-    }
-    .toast-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 12px 18px;
-      border-radius: 14px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 600;
-    }
-
-    .hidden { display: none !important; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{--bg:#0b0e14;--surface:#131824;--surface-light:#1d2638;--border:rgba(255,255,255,0.06);--text:#f8fafc;--muted:#94a3b8;--primary:#ec4899;--primary-glow:rgba(236,72,153,0.3);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--gradient:linear-gradient(135deg,#ec4899 0%,#8b5cf6 100%);--radius:20px}
+  html,body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+  body{padding-bottom:100px}
+  #app-loader{position:fixed;inset:0;background:var(--bg);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;transition:opacity .4s}
+  #app-loader.hide{opacity:0;pointer-events:none}
+  .spinner{width:48px;height:48px;border:3px solid var(--surface-light);border-top:3px solid var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .top-user-box{margin:16px;background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+  .tu-left h1{font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .tu-right{display:flex;align-items:center;gap:12px}
+  .welcome-wrap{text-align:right}
+  .welcome-name{font-size:13px;font-weight:700}
+  .welcome-id{font-size:11px;color:var(--muted)}
+  .tu-avatar{width:42px;height:42px;border-radius:50%;background:var(--gradient);display:grid;place-items:center;font-size:15px;font-weight:800;overflow:hidden}
+  .tu-avatar img{width:100%;height:100%;object-fit:cover}
+  .search-wrap{padding:0 16px 12px}
+  .search-box{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);padding:12px 18px;border-radius:var(--radius)}
+  .search-box input{background:none;border:none;color:#fff;font-size:14px;width:100%;outline:none;font-family:inherit}
+  .search-box button{background:var(--gradient);border:none;width:36px;height:36px;border-radius:12px;color:#fff;cursor:pointer}
+  .cat-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 16px 14px;scrollbar-width:none}
+  .cat-scroll::-webkit-scrollbar{display:none}
+  .cat-pill{padding:8px 18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--muted)}
+  .cat-pill.active{background:var(--gradient);border-color:transparent;color:#fff}
+  .view{display:none;padding:0 16px}
+  .view.active{display:block}
+  .section-title{font-size:16px;font-weight:800;margin:8px 0 12px;color:var(--primary)}
+  .video-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .video-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer}
+  .thumb-wrap{aspect-ratio:4/3;position:relative;background:#000}
+  .thumb-wrap img{width:100%;height:100%;object-fit:cover}
+  .status-badge{position:absolute;top:8px;left:8px;padding:3px 8px;border-radius:6px;font-size:9px;font-weight:700}
+  .badge-lock{background:rgba(0,0,0,.65);color:var(--warning)}
+  .badge-unlock{background:rgba(16,185,129,.85);color:#fff}
+  .play-overlay{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.22)}
+  .play-icon{width:36px;height:36px;background:rgba(255,255,255,.25);border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px}
+  .card-details{padding:10px}
+  .card-heading{font-size:12px;font-weight:700;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:32px}
+  .card-meta{margin-top:8px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+  .card-tag{background:rgba(236,72,153,.15);color:var(--primary);padding:2px 6px;border-radius:4px;font-weight:700;font-size:9px}
+  .empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:280px;padding:40px 20px}
+  .empty-icon{font-size:70px;margin-bottom:14px}
+  .empty-text{font-size:16px;font-weight:600;color:var(--muted)}
+  .profile-cover{height:110px;background:var(--gradient);border-radius:24px 24px 0 0;margin-bottom:-40px}
+  .profile-identity-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:0 20px 22px;text-align:center;margin-bottom:16px;position:relative}
+  .profile-avatar-box{width:84px;height:84px;border-radius:50%;background:var(--surface);margin:0 auto 12px;padding:3px;position:relative;top:-42px}
+  .profile-avatar-box img,.profile-avatar-box .fallback{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface-light);color:#fff;display:grid;place-items:center;font-size:26px;font-weight:800}
+  .profile-name{font-size:18px;font-weight:800;margin-top:-32px;margin-bottom:3px}
+  .profile-username{font-size:13px;color:var(--muted);margin-bottom:12px}
+  .profile-id-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface-light);border:1px solid var(--border);padding:6px 14px;border-radius:30px;font-size:12px;font-weight:700}
+  .premium-banner{background:linear-gradient(135deg,#f59e0b,#ec4899);border-radius:18px;padding:16px;margin-bottom:16px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .profile-menu-list{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;margin-bottom:18px}
+  .profile-menu-item{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid var(--border);cursor:pointer}
+  .profile-menu-item:last-child{border-bottom:none}
+  .menu-item-left{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:700}
+  .viral-link-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .v-info{display:flex;align-items:center;gap:12px;overflow:hidden}
+  .v-icon{width:42px;height:42px;border-radius:12px;background:var(--surface-light);display:grid;place-items:center;font-size:18px;color:var(--primary)}
+  .v-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,14,20,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 4px calc(10px + env(safe-area-inset-bottom));z-index:150}
+  .nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;color:#6b7280!important;font-size:11px;font-weight:600;flex:1;background:transparent!important;border:none;cursor:pointer;font-family:inherit;padding:6px 0;position:relative}
+  .nav-btn.active{color:#ec4899!important}
+  .nav-btn.active::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:18px;height:3px;background:var(--primary);border-radius:3px}
+  .nav-btn i{font-size:22px;font-style:normal;line-height:1;color:inherit!important}
+  .nav-btn span{color:inherit!important}
+  .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);display:none;align-items:flex-end}
+  .modal-overlay.open{display:flex}
+  .modal-sheet{background:var(--bg);width:100%;max-height:92vh;border-radius:28px 28px 0 0;display:flex;flex-direction:column;overflow:hidden;border-top:1px solid var(--border)}
+  .sheet-top{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+  .sheet-body{padding:18px;overflow-y:auto;flex:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;width:100%;border:none;color:#fff;cursor:pointer;font-family:inherit}
+  .btn-primary{background:var(--gradient)}
+  .btn-success{background:var(--success)}
+  .btn-ghost{background:var(--surface-light);border:1px solid var(--border)}
+  .btn-danger{background:var(--danger)}
+  .form-group{margin-bottom:12px}
+  .form-group label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;color:var(--muted)}
+  .form-group input,.form-group select{width:100%;background:var(--surface);border:1px solid var(--border);padding:11px;border-radius:12px;color:#fff;font-family:inherit;font-size:13px;outline:none}
+  .admin-panel-card{background:var(--surface);border:1px solid var(--border);padding:16px;border-radius:18px;margin-bottom:14px}
+  .admin-list-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface-light);border:1px solid var(--border);padding:10px 12px;border-radius:12px;margin-bottom:8px;gap:8px}
+  .progress-wrap{margin:12px 0}
+  .progress-labels{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;color:var(--muted);font-weight:600}
+  .progress-bar-track{height:7px;background:var(--surface-light);border-radius:8px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:var(--gradient);border-radius:8px;transition:.3s;width:0%}
+  .analytics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  .analytic-card{background:var(--surface-light);border:1px solid var(--border);padding:12px;border-radius:14px;text-align:center}
+  .analytic-card h5{font-size:11px;color:var(--muted);margin-bottom:4px}
+  .analytic-card p{font-size:17px;font-weight:800}
+  #toast-box{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:4000;width:90%;max-width:360px;pointer-events:none}
+  .toast-item{background:var(--surface);border:1px solid var(--border);padding:11px 16px;border-radius:12px;margin-bottom:8px;font-size:13px;display:flex;align-items:center;gap:10px;font-weight:600}
+  .hidden{display:none!important}
   </style>
 </head>
 <body>
 
-<!-- LOADER -->
 <div id="app-loader">
   <div class="spinner"></div>
   <p style="font-size:13px;color:var(--muted);font-weight:600">লোড হচ্ছে...</p>
 </div>
 
-<!-- TOP BAR -->
 <div class="top-user-box">
   <div class="tu-left"><h1>ভাইরাল ভিডিও</h1></div>
   <div class="tu-right">
@@ -562,11 +115,10 @@
       <div class="welcome-name" id="top-user-name">ইউজার</div>
       <div class="welcome-id" id="top-user-id">ID: 0000</div>
     </div>
-    <div class="tu-avatar" id="top-avatar-container">UV</div>
+    <div class="tu-avatar" id="top-avatar">UV</div>
   </div>
 </div>
 
-<!-- SEARCH (শুধু হোম) -->
 <div class="search-wrap" id="search-wrap">
   <div class="search-box">
     <span>🔍</span>
@@ -575,84 +127,113 @@
   </div>
 </div>
 
-<!-- CATEGORY (শুধু হোম) -->
 <div class="cat-scroll" id="category-tabs"></div>
 
-<!-- HOME -->
 <section class="view active" id="view-home">
   <h3 class="section-title">📹 সকল ভিডিও</h3>
   <div class="video-grid" id="main-grid"></div>
 </section>
 
-<!-- FAVORITES -->
 <section class="view" id="view-fav">
   <h3 class="section-title">❤️ পছন্দের ভিডিও</h3>
   <div class="video-grid" id="fav-grid"></div>
 </section>
 
-<!-- UNLOCKED -->
 <section class="view" id="view-tutorial">
   <h3 class="section-title">🔓 আনলক করা ভিডিও</h3>
   <div class="video-grid" id="tutorial-grid"></div>
 </section>
 
-<!-- LINKS -->
 <section class="view" id="view-links">
   <h3 class="section-title">🔗 প্রয়োজনীয় লিংক</h3>
   <div id="viral-links-container"></div>
 </section>
 
-<!-- PROFILE -->
 <section class="view" id="view-profile">
   <div class="profile-cover"></div>
   <div class="profile-identity-card">
-    <div class="profile-avatar-box" id="profile-avatar-container"></div>
+    <div class="profile-avatar-box" id="profile-avatar"></div>
     <div class="profile-name" id="prof-name">ইউজার</div>
     <div class="profile-username" id="prof-username">@username</div>
     <div class="profile-id-pill"><span>🆔</span> <span id="prof-id">00000000</span></div>
   </div>
+  <div class="premium-banner" id="prem-box">
+    <div>
+      <h4 style="font-size:15px;font-weight:800;margin-bottom:3px">👑 VIP প্রিমিয়াম</h4>
+      <p style="font-size:12px;opacity:.9">সব ভিডিও আজীবন আনলক</p>
+    </div>
+    <button class="btn btn-primary" style="width:auto;padding:8px 14px;background:#fff;color:var(--primary);font-size:13px" onclick="buyPremium()">শুরু করুন</button>
+  </div>
   <div class="profile-menu-list">
-    <div class="profile-menu-item" onclick="showView('fav')">
-      <div class="menu-item-left"><span>❤️</span><span>Favorites</span></div><span>›</span>
-    </div>
-    <div class="profile-menu-item" onclick="showView('tutorial')">
-      <div class="menu-item-left"><span>🔓</span><span>Unlocked Videos</span></div><span>›</span>
-    </div>
+    <div class="profile-menu-item" onclick="showView('fav')"><div class="menu-item-left"><span>❤️</span><span>Favorites</span></div><span>›</span></div>
+    <div class="profile-menu-item" onclick="showView('tutorial')"><div class="menu-item-left"><span>🔓</span><span>Unlocked Videos</span></div><span>›</span></div>
   </div>
 </section>
 
-<!-- ADMIN -->
 <section class="view" id="view-admin">
   <h3 class="section-title">🛠 অ্যাডমিন ড্যাশবোর্ড</h3>
-  <div class="admin-panel-card">
-    <h4>➕ নতুন ভিডিও আপলোড</h4>
-    <div class="form-group"><label>শিরোনাম</label><input id="av-title" type="text"></div>
-    <div class="form-group"><label>ক্যাটাগরি</label><select id="av-cat"></select></div>
-    <div class="form-group"><label>থাম্বনেইল</label><input accept="image/*" id="av-thumb-file" type="file"></div>
-    <div class="form-group"><label>ভিডিও ফাইল</label><input accept="video/*" id="av-file" type="file"></div>
-    <div class="form-group"><label>প্রয়োজনীয় বিজ্ঞাপন</label><input id="av-ads" min="1" type="number" value="1"></div>
-    <button class="btn btn-primary" onclick="saveVideo()">আপলোড করুন</button>
+  <div class="analytics-grid">
+    <div class="analytic-card"><h5>মোট ভিডিও</h5><p id="stat-videos">0</p></div>
+    <div class="analytic-card"><h5>মোট ভিউ</h5><p id="stat-views">0</p></div>
+    <div class="analytic-card"><h5>মোট আনলক</h5><p id="stat-unlocked">0</p></div>
+    <div class="analytic-card"><h5>VIP</h5><p id="stat-vip">0</p></div>
   </div>
-  <div id="admin-vid-list"></div>
+
+  <div class="cat-scroll" style="padding:0;margin-bottom:12px">
+    <button class="cat-pill active" onclick="switchAdminTab('vids',this)">ভিডিও</button>
+    <button class="cat-pill" onclick="switchAdminTab('links',this)">লিংক</button>
+    <button class="cat-pill" onclick="switchAdminTab('cats',this)">ক্যাটাগরি</button>
+  </div>
+
+  <div id="admin-vids">
+    <div class="admin-panel-card">
+      <h4 id="av-form-title">➕ নতুন ভিডিও</h4>
+      <input type="hidden" id="av-edit-id">
+      <div class="form-group"><label>শিরোনাম</label><input id="av-title" type="text"></div>
+      <div class="form-group"><label>ক্যাটাগরি</label><select id="av-cat"></select></div>
+      <div class="form-group"><label>থাম্বনেইল URL</label><input id="av-thumb" type="text" placeholder="https://..."></div>
+      <div class="form-group"><label>ভিডিও লিংক (URL)</label><input id="av-link" type="text" placeholder="https://..."></div>
+      <div class="form-group"><label>প্রয়োজনীয় বিজ্ঞাপন</label><input id="av-ads" type="number" value="1" min="1"></div>
+      <button class="btn btn-primary" id="av-btn" onclick="saveVideo()">সেভ করুন</button>
+    </div>
+    <div id="admin-vid-list"></div>
+  </div>
+
+  <div id="admin-links" class="hidden">
+    <div class="admin-panel-card">
+      <h4>➕ নতুন লিংক</h4>
+      <div class="form-group"><label>শিরোনাম</label><input id="al-title" type="text"></div>
+      <div class="form-group"><label>URL</label><input id="al-url" type="text"></div>
+      <button class="btn btn-primary" onclick="saveLink()">লিংক সেভ</button>
+    </div>
+    <div id="admin-link-list"></div>
+  </div>
+
+  <div id="admin-cats" class="hidden">
+    <div class="admin-panel-card">
+      <h4>➕ নতুন ক্যাটাগরি</h4>
+      <div class="form-group"><label>নাম</label><input id="ac-name" type="text"></div>
+      <button class="btn btn-primary" onclick="saveCategory()">ক্যাটাগরি সেভ</button>
+    </div>
+    <div id="admin-cat-list"></div>
+  </div>
 </section>
 
-<!-- VIDEO DETAIL MODAL -->
 <div class="modal-overlay" id="modal-detail">
   <div class="modal-sheet">
     <div class="sheet-top">
       <button onclick="closeModal()" style="background:none;border:none;font-size:22px;color:#fff">✕</button>
-      <div style="font-weight:700;font-size:14px">ভিডিও প্লেয়ার</div>
-      <div style="width:30px"></div>
+      <div style="font-weight:700;font-size:14px">ভিডিও</div>
+      <div style="width:28px"></div>
     </div>
     <div class="sheet-body">
-      <div id="md-media-container" style="width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000;margin-bottom:15px"></div>
-      <h2 id="md-title" style="font-size:16px;font-weight:800;margin-bottom:8px"></h2>
-      <div id="md-action-area"></div>
+      <div id="md-media" style="width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;margin-bottom:14px"></div>
+      <h2 id="md-title" style="font-size:16px;font-weight:800;margin-bottom:10px"></h2>
+      <div id="md-action"></div>
     </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <button class="nav-btn active" onclick="showView('home')"><i>🏠</i><span>হোম</span></button>
   <button class="nav-btn" onclick="showView('fav')"><i>❤️</i><span>পছন্দ</span></button>
@@ -664,417 +245,530 @@
 <div id="toast-box"></div>
 
 <script>
-// ========== সবচেয়ে গুরুত্বপূর্ণ: লোডার হাইড ==========
-function hideLoader() {
-  var loader = document.getElementById('app-loader');
-  if (loader) {
-    loader.classList.add('hide');
-    setTimeout(function() {
-      loader.style.display = 'none';
-    }, 300);
+// ========== LOADER (২-৩ সেকেন্ড রাখবে) ==========
+function hideLoader(){
+  var el = document.getElementById('app-loader');
+  if(el){
+    el.classList.add('hide');
+    setTimeout(function(){ el.style.display = 'none'; }, 400);
   }
 }
 
-// অনেকগুলো সেফটি
-setTimeout(hideLoader, 400);
-setTimeout(hideLoader, 1000);
-setTimeout(hideLoader, 2000);
-setTimeout(hideLoader, 3500);
-
-// ========== মূল ভেরিয়েবল ==========
+// ========== CONFIG + SUPABASE ==========
 var ADMIN_ID = 6377295796;
-var STORE_KEY = "ViralVideo_Simple_V1";
+var STORE_KEY = "ViralVideo_Full_V2";
+var SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
+var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
+var BUCKET = "Viral Video";
+
+var supabaseClient = null;
+try {
+  if (window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch(e){}
 
 var state = {
-  categories: [{ id: 'cat_all', name: 'All' }],
+  categories: [{id:'cat_all', name:'All'}],
   videos: [],
   viralLinks: [],
   unlocked: {},
   favorites: {},
-  progress: {}
+  progress: {},
+  vipMembers: {}
 };
 
 var tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : {};
-var user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : {
-  id: 6377295796,
-  first_name: 'User',
-  username: 'user',
-  photo_url: ''
-};
+var user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : {id:6377295796, first_name:'User', username:'user'};
 var currentCat = 'cat_all';
-var currentActiveVid = null;
+var currentVid = null;
 
-// ========== ইনিশিয়ালাইজ ==========
-function initApp() {
-  try {
-    if (tg.ready) tg.ready();
-    if (tg.expand) tg.expand();
+// ========== INIT ==========
+async function init(){
+  try{
+    if(tg.ready) tg.ready();
+    if(tg.expand) tg.expand();
 
-    // LocalStorage লোড
-    try {
-      var saved = localStorage.getItem(STORE_KEY);
-      if (saved) {
-        var parsed = JSON.parse(saved);
-        if (parsed.unlocked) state.unlocked = parsed.unlocked;
-        if (parsed.favorites) state.favorites = parsed.favorites;
-        if (parsed.videos) state.videos = parsed.videos;
-        if (parsed.categories) state.categories = parsed.categories;
-        if (parsed.viralLinks) state.viralLinks = parsed.viralLinks;
+    // localStorage থেকে লোড
+    try{
+      var s = localStorage.getItem(STORE_KEY);
+      if(s){
+        var p = JSON.parse(s);
+        if(p.categories) state.categories = p.categories;
+        if(p.videos) state.videos = p.videos;
+        if(p.viralLinks) state.viralLinks = p.viralLinks;
+        if(p.unlocked) state.unlocked = p.unlocked;
+        if(p.favorites) state.favorites = p.favorites;
+        if(p.progress) state.progress = p.progress;
+        if(p.vipMembers) state.vipMembers = p.vipMembers;
       }
-    } catch(e) {}
+    }catch(e){}
 
-    // অ্যাডমিন চেক
-    if (Number(user.id) === ADMIN_ID) {
-      var adminBtn = document.getElementById('nav-admin');
-      if (adminBtn) adminBtn.classList.remove('hidden');
+    // Supabase থেকে ডাটা আনার চেষ্টা (ব্যাকগ্রাউন্ডে)
+    loadFromSupabase();
+
+    if(Number(user.id) === ADMIN_ID){
+      var a = document.getElementById('nav-admin');
+      if(a) a.classList.remove('hidden');
     }
 
     renderProfile();
     renderCategories();
     renderAll();
-  } catch(e) {
-    console.log('Init error:', e);
+  }catch(e){
+    console.log(e);
   }
 
-  // সবশেষে লোডার হাইড
-  hideLoader();
+  // ২.৫ সেকেন্ড পর লোডার হাইড হবে
+  setTimeout(hideLoader, 2500);
 }
 
-function saveState() {
-  try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(state));
-  } catch(e) {}
+async function loadFromSupabase(){
+  if(!supabaseClient) return;
+  try{
+    var [v, c, l] = await Promise.allSettled([
+      supabaseClient.from('videos').select('*'),
+      supabaseClient.from('categories').select('*'),
+      supabaseClient.from('viral_links').select('*')
+    ]);
+    if(v.status === 'fulfilled' && v.value && v.value.data && v.value.data.length){
+      state.videos = v.value.data;
+    }
+    if(c.status === 'fulfilled' && c.value && c.value.data && c.value.data.length){
+      var cats = c.value.data;
+      if(!cats.some(function(x){return x.id==='cat_all';})) cats.unshift({id:'cat_all',name:'All'});
+      state.categories = cats;
+    }
+    if(l.status === 'fulfilled' && l.value && l.value.data){
+      state.viralLinks = l.value.data;
+    }
+    save();
+    renderCategories();
+    renderAll();
+  }catch(e){}
 }
 
-// ========== রেন্ডার ফাংশন ==========
-function renderProfile() {
-  var fullName = user.first_name || 'User';
-  if (user.last_name) fullName += ' ' + user.last_name;
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+}
 
-  setText('top-user-name', fullName);
-  setText('top-user-id', 'ID: ' + (user.id || '0000'));
-  setText('prof-name', fullName);
-  setText('prof-username', user.username ? '@' + user.username : '@username');
+// ========== RENDER FUNCTIONS ==========
+function setText(id, val){
+  var el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+function renderProfile(){
+  var name = user.first_name || 'User';
+  if(user.last_name) name += ' ' + user.last_name;
+  setText('top-user-name', name);
+  setText('top-user-id', 'ID: ' + (user.id||'0000'));
+  setText('prof-name', name);
+  setText('prof-username', user.username ? '@'+user.username : '@user');
   setText('prof-id', user.id || '00000000');
 
-  var boxes = [
-    document.getElementById('top-avatar-container'),
-    document.getElementById('profile-avatar-container')
-  ];
-  boxes.forEach(function(box) {
-    if (!box) return;
-    if (user.photo_url) {
-      box.innerHTML = '<img src="' + user.photo_url + '">';
-    } else {
-      var initials = fullName.split(' ').map(function(n){ return n[0]; }).join('').substring(0,2).toUpperCase();
-      box.innerHTML = '<div class="fallback-avatar">' + initials + '</div>';
+  ['top-avatar','profile-avatar'].forEach(function(id){
+    var box = document.getElementById(id);
+    if(!box) return;
+    if(user.photo_url){
+      box.innerHTML = '<img src="'+user.photo_url+'">';
+    }else{
+      var ini = name.split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+      box.innerHTML = '<div class="fallback">'+ini+'</div>';
     }
   });
-}
 
-function setText(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val;
-}
-
-function renderCategories() {
-  var container = document.getElementById('category-tabs');
-  if (!container) return;
-
-  var html = '';
-  state.categories.forEach(function(c) {
-    var active = currentCat === c.id ? 'active' : '';
-    html += '<button class="cat-pill ' + active + '" onclick="switchCat(\'' + c.id + '\')">' + c.name + '</button>';
-  });
-  container.innerHTML = html;
-
-  var sel = document.getElementById('av-cat');
-  if (sel) {
-    var opts = '';
-    state.categories.forEach(function(c) {
-      if (c.id !== 'cat_all') {
-        opts += '<option value="' + c.id + '">' + c.name + '</option>';
-      }
-    });
-    sel.innerHTML = opts;
+  if(state.vipMembers[user.id]){
+    var box = document.getElementById('prem-box');
+    if(box) box.innerHTML = '<div><h4 style="font-size:15px;font-weight:800">👑 VIP মেম্বার</h4><p style="font-size:12px;opacity:.9">অ্যাকাউন্টটি অ্যাক্টিভ</p></div>';
   }
 }
 
-function createCard(v) {
-  var isUnlocked = state.unlocked[v.id];
-  var isFav = state.favorites[v.id];
+function renderCategories(){
+  var cont = document.getElementById('category-tabs');
+  if(!cont) return;
+  cont.innerHTML = state.categories.map(function(c){
+    return '<button class="cat-pill '+(currentCat===c.id?'active':'')+'" onclick="switchCat(\''+c.id+'\')">'+c.name+'</button>';
+  }).join('');
+
+  var sel = document.getElementById('av-cat');
+  if(sel){
+    sel.innerHTML = state.categories.filter(function(c){return c.id!=='cat_all';}).map(function(c){
+      return '<option value="'+c.id+'">'+c.name+'</option>';
+    }).join('');
+  }
+}
+
+function createCard(v){
+  var unlocked = state.vipMembers[user.id] || state.unlocked[v.id];
+  var fav = state.favorites[v.id];
   var views = v.views ? Object.keys(v.views).length : 0;
-  var cat = state.categories.find(function(c){ return c.id === v.category_id; });
+  var cat = state.categories.find(function(c){return c.id===v.category_id;});
   var catName = cat ? cat.name : 'VIRAL';
   var thumb = v.thumb || 'https://via.placeholder.com/320x240?text=Video';
 
-  return '<div class="video-card" onclick="openDetail(\'' + v.id + '\')">' +
-    '<div class="thumb-wrap">' +
-      '<img src="' + thumb + '" loading="lazy" onerror="this.src=\'https://via.placeholder.com/320x240?text=Video\'">' +
-      '<div class="status-badge ' + (isUnlocked ? 'badge-unlock' : 'badge-lock') + '">' +
-        (isUnlocked ? '🔓 Unlocked' : '🔒 Locked') +
-      '</div>' +
-      '<div class="play-overlay"><div class="play-icon">▶</div></div>' +
-    '</div>' +
-    '<div class="card-details">' +
-      '<div style="margin-bottom:4px"><span class="card-tag">' + catName + '</span></div>' +
-      '<div class="card-heading">' + escapeHtml(v.title) + '</div>' +
-      '<div class="card-meta"><span>👁 ' + views + '</span><span>' + (isFav ? '❤️' : '🤍') + '</span></div>' +
-    '</div>' +
-  '</div>';
+  return '<div class="video-card" onclick="openDetail(\''+v.id+'\')">'+
+    '<div class="thumb-wrap">'+
+      '<img src="'+thumb+'" loading="lazy" onerror="this.src=\'https://via.placeholder.com/320x240?text=Video\'">'+
+      '<div class="status-badge '+(unlocked?'badge-unlock':'badge-lock')+'">'+(unlocked?'🔓 Unlocked':'🔒 Locked')+'</div>'+
+      '<div class="play-overlay"><div class="play-icon">▶</div></div>'+
+    '</div>'+
+    '<div class="card-details">'+
+      '<div style="margin-bottom:4px"><span class="card-tag">'+catName+'</span></div>'+
+      '<div class="card-heading">'+esc(v.title)+'</div>'+
+      '<div class="card-meta"><span>👁 '+views+'</span><span>'+(fav?'❤️':'🤍')+'</span></div>'+
+    '</div></div>';
 }
 
-function renderAll() {
+function renderAll(){
   renderHome();
   renderFavs();
-  renderTutorial();
-  renderViralLinks();
+  renderUnlocked();
+  renderLinks();
   renderAdmin();
 }
 
-function renderHome() {
+function renderHome(){
   var grid = document.getElementById('main-grid');
-  if (!grid) return;
-
-  var q = (document.getElementById('main-search') || {}).value || '';
+  if(!grid) return;
+  var q = (document.getElementById('main-search')||{}).value||'';
   var vids = state.videos.slice();
-
-  if (currentCat !== 'cat_all') {
-    vids = vids.filter(function(v){ return v.category_id === currentCat; });
-  }
-  if (q.trim()) {
+  if(currentCat !== 'cat_all') vids = vids.filter(function(v){return v.category_id===currentCat;});
+  if(q.trim()){
     q = q.toLowerCase();
-    vids = vids.filter(function(v){ return (v.title || '').toLowerCase().indexOf(q) > -1; });
+    vids = vids.filter(function(v){return (v.title||'').toLowerCase().indexOf(q)>-1;});
   }
-
-  if (vids.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📹</div><div class="empty-text">কোনো ভিডিও<br>পাওয়া যায়নি</div></div>';
-  } else {
+  if(vids.length===0){
+    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">📹</div><div class="empty-text">কোনো ভিডিও পাওয়া যায়নি</div></div>';
+  }else{
     grid.innerHTML = vids.map(createCard).join('');
   }
 }
 
-function renderFavs() {
+function renderFavs(){
   var grid = document.getElementById('fav-grid');
-  if (!grid) return;
-  var vids = state.videos.filter(function(v){ return state.favorites[v.id]; });
-  if (vids.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">পছন্দের ভিডিও<br>নেই</div></div>';
-  } else {
-    grid.innerHTML = vids.map(createCard).join('');
-  }
+  if(!grid) return;
+  var vids = state.videos.filter(function(v){return state.favorites[v.id];});
+  grid.innerHTML = vids.length ? vids.map(createCard).join('') :
+    '<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">পছন্দের ভিডিও নেই</div></div>';
 }
 
-function renderTutorial() {
+function renderUnlocked(){
   var grid = document.getElementById('tutorial-grid');
-  if (!grid) return;
-  var vids = state.videos.filter(function(v){ return state.unlocked[v.id]; });
-  if (vids.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🔓</div><div class="empty-text">কোনো আনলক করা<br>ভিডিও নেই</div></div>';
-  } else {
-    grid.innerHTML = vids.map(createCard).join('');
-  }
+  if(!grid) return;
+  var vids = state.videos.filter(function(v){return state.vipMembers[user.id]||state.unlocked[v.id];});
+  grid.innerHTML = vids.length ? vids.map(createCard).join('') :
+    '<div class="empty-state"><div class="empty-icon">🔓</div><div class="empty-text">কোনো আনলক করা ভিডিও নেই</div></div>';
 }
 
-function renderViralLinks() {
+function renderLinks(){
   var cont = document.getElementById('viral-links-container');
-  if (!cont) return;
+  if(!cont) return;
   var links = state.viralLinks || [];
-  if (links.length === 0) {
+  if(links.length===0){
     cont.innerHTML = '<div class="empty-state"><div class="empty-icon">🔗</div><div class="empty-text">কোনো লিংক নেই</div></div>';
     return;
   }
-  cont.innerHTML = links.map(function(l) {
-    return '<div class="viral-link-box">' +
-      '<div class="v-info"><div class="v-icon">✈️</div><div><div class="v-title">' + escapeHtml(l.title) + '</div><div class="v-url">link</div></div></div>' +
-      '<button class="btn btn-primary" style="width:auto;padding:8px 16px;font-size:12px;border-radius:30px" onclick="openExternal(\'' + (l.url || '') + '\')">Open</button>' +
+  cont.innerHTML = links.map(function(l){
+    return '<div class="viral-link-box">'+
+      '<div class="v-info"><div class="v-icon">✈️</div><div><div class="v-title">'+esc(l.title)+'</div></div></div>'+
+      '<button class="btn btn-primary" style="width:auto;padding:8px 14px;font-size:12px;border-radius:30px" onclick="openUrl(\''+(l.url||'')+'\')">Open</button>'+
     '</div>';
   }).join('');
 }
 
-function renderAdmin() {
-  if (Number(user.id) !== ADMIN_ID) return;
-  var list = document.getElementById('admin-vid-list');
-  if (!list) return;
-  list.innerHTML = state.videos.map(function(v) {
-    return '<div class="admin-list-row">' +
-      '<div style="font-size:12px;font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + escapeHtml(v.title) + '</div>' +
-      '<button class="btn btn-danger" style="width:auto;padding:6px 12px;font-size:11px" onclick="deleteVideo(\'' + v.id + '\')">ডিলিট</button>' +
-    '</div>';
-  }).join('');
+function renderAdmin(){
+  if(Number(user.id) !== ADMIN_ID) return;
+
+  var totalViews = 0;
+  state.videos.forEach(function(v){ if(v.views) totalViews += Object.keys(v.views).length; });
+  setText('stat-videos', state.videos.length);
+  setText('stat-views', totalViews);
+  setText('stat-unlocked', Object.keys(state.unlocked).length);
+  setText('stat-vip', Object.keys(state.vipMembers).length);
+
+  var vl = document.getElementById('admin-vid-list');
+  if(vl){
+    vl.innerHTML = state.videos.map(function(v){
+      return '<div class="admin-list-row">'+
+        '<div style="font-size:12px;font-weight:700;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(v.title)+'</div>'+
+        '<div style="display:flex;gap:6px">'+
+          '<button class="btn btn-ghost" style="width:auto;padding:5px 10px;font-size:11px" onclick="editVideo(\''+v.id+'\')">এডিট</button>'+
+          '<button class="btn btn-danger" style="width:auto;padding:5px 10px;font-size:11px" onclick="deleteVideo(\''+v.id+'\')">ডিলিট</button>'+
+        '</div></div>';
+    }).join('');
+  }
+
+  var ll = document.getElementById('admin-link-list');
+  if(ll){
+    ll.innerHTML = (state.viralLinks||[]).map(function(l){
+      return '<div class="admin-list-row">'+
+        '<div style="font-size:12px;font-weight:700;max-width:160px;overflow:hidden;text-overflow:ellipsis">'+esc(l.title)+'</div>'+
+        '<button class="btn btn-danger" style="width:auto;padding:5px 10px;font-size:11px" onclick="deleteLink(\''+l.id+'\')">ডিলিট</button>'+
+      '</div>';
+    }).join('');
+  }
+
+  var cl = document.getElementById('admin-cat-list');
+  if(cl){
+    cl.innerHTML = state.categories.map(function(c){
+      return '<div class="admin-list-row">'+
+        '<div style="font-size:12px;font-weight:700">'+esc(c.name)+'</div>'+
+        (c.id!=='cat_all' ? '<button class="btn btn-danger" style="width:auto;padding:5px 10px;font-size:11px" onclick="deleteCategory(\''+c.id+'\')">ডিলিট</button>' : '<span style="font-size:11px;color:var(--muted)">Default</span>')+
+      '</div>';
+    }).join('');
+  }
 }
 
-// ========== অ্যাকশন ==========
-function showView(id) {
-  var views = document.querySelectorAll('.view');
-  for (var i = 0; i < views.length; i++) {
-    views[i].classList.remove('active');
-  }
-  var target = document.getElementById('view-' + id);
-  if (target) target.classList.add('active');
+// ========== ACTIONS ==========
+function showView(id){
+  document.querySelectorAll('.view').forEach(function(v){ v.classList.remove('active'); });
+  var t = document.getElementById('view-'+id);
+  if(t) t.classList.add('active');
 
-  // Search & Category শুধু হোমে
-  var searchWrap = document.getElementById('search-wrap');
-  var catTabs = document.getElementById('category-tabs');
-  if (id === 'home') {
-    if (searchWrap) searchWrap.classList.remove('hidden');
-    if (catTabs) catTabs.classList.remove('hidden');
-  } else {
-    if (searchWrap) searchWrap.classList.add('hidden');
-    if (catTabs) catTabs.classList.add('hidden');
+  var search = document.getElementById('search-wrap');
+  var cats = document.getElementById('category-tabs');
+  if(id==='home'){
+    if(search) search.classList.remove('hidden');
+    if(cats) cats.classList.remove('hidden');
+  }else{
+    if(search) search.classList.add('hidden');
+    if(cats) cats.classList.add('hidden');
   }
 
-  // Nav active
+  document.querySelectorAll('.nav-btn').forEach(function(n){ n.classList.remove('active'); });
+  var map = {home:0, fav:1, links:2, profile:3, admin:4};
   var navs = document.querySelectorAll('.nav-btn');
-  for (var j = 0; j < navs.length; j++) {
-    navs[j].classList.remove('active');
-  }
-  var map = { home: 0, fav: 1, links: 2, profile: 3, admin: 4 };
-  if (map[id] !== undefined && navs[map[id]]) {
-    navs[map[id]].classList.add('active');
-  }
+  if(map[id]!==undefined && navs[map[id]]) navs[map[id]].classList.add('active');
 }
 
-function switchCat(id) {
-  currentCat = id;
-  renderCategories();
-  renderHome();
-}
+function switchCat(id){ currentCat = id; renderCategories(); renderHome(); }
+function handleSearch(){ renderHome(); }
 
-function handleSearch() {
-  renderHome();
-}
-
-function openDetail(id) {
-  var v = null;
-  for (var i = 0; i < state.videos.length; i++) {
-    if (state.videos[i].id === id) {
-      v = state.videos[i];
-      break;
-    }
-  }
-  if (!v) return;
-
-  currentActiveVid = v;
-  if (!v.views) v.views = {};
+function openDetail(id){
+  var v = state.videos.find(function(x){return x.id===id;});
+  if(!v) return;
+  currentVid = v;
+  if(!v.views) v.views = {};
   v.views[user.id] = true;
-  saveState();
+  save();
 
   document.getElementById('md-title').textContent = v.title || '';
+  var media = document.getElementById('md-media');
+  var action = document.getElementById('md-action');
+  var unlocked = state.vipMembers[user.id] || state.unlocked[v.id];
 
-  var media = document.getElementById('md-media-container');
-  var action = document.getElementById('md-action-area');
-  var isUnlocked = state.unlocked[v.id];
-
-  if (isUnlocked && v.link) {
-    media.innerHTML = '<video src="' + v.link + '" controls style="width:100%;height:100%"></video>';
-    action.innerHTML = '<button class="btn btn-success" onclick="window.open(\'' + v.link + '\',\'_blank\')">📥 ডাউনলোড করুন</button>';
-  } else {
-    media.innerHTML = '<div style="width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff">🔒 Protected Media</div>';
-    var prog = state.progress[v.id] || 0;
-    var req = v.required_ads || 1;
-    var pct = Math.floor((prog / req) * 100);
+  if(unlocked && v.link){
+    media.innerHTML = '<video src="'+v.link+'" controls style="width:100%;height:100%"></video>';
+    action.innerHTML = '<button class="btn btn-success" onclick="window.open(\''+v.link+'\',\'_blank\')">📥 ডাউনলোড</button>';
+  }else{
+    media.innerHTML = '<div style="width:100%;height:100%;display:grid;place-items:center;background:#111;color:#fff">🔒 Locked</div>';
+    var prog = state.progress[v.id]||0;
+    var req = v.required_ads||1;
+    var pct = Math.floor((prog/req)*100);
     action.innerHTML =
-      '<div class="progress-wrap">' +
-        '<div class="progress-labels"><span>আনলক প্রোগ্রেস</span><span>' + prog + '/' + req + '</span></div>' +
-        '<div class="progress-bar-track"><div class="progress-bar-fill" style="width:' + pct + '%"></div></div>' +
-      '</div>' +
-      '<button class="btn btn-primary" onclick="watchAd()">📺 বিজ্ঞাপন দেখে আনলক করুন</button>';
+      '<div class="progress-wrap">'+
+        '<div class="progress-labels"><span>প্রোগ্রেস</span><span>'+prog+'/'+req+'</span></div>'+
+        '<div class="progress-bar-track"><div class="progress-bar-fill" style="width:'+pct+'%"></div></div>'+
+      '</div>'+
+      '<button class="btn btn-primary" onclick="doUnlock()">📺 বিজ্ঞাপন দেখে আনলক</button>';
   }
-
   document.getElementById('modal-detail').classList.add('open');
 }
 
-function closeModal() {
+function closeModal(){
   document.getElementById('modal-detail').classList.remove('open');
-  document.getElementById('md-media-container').innerHTML = '';
+  document.getElementById('md-media').innerHTML = '';
 }
 
-function watchAd() {
-  if (!currentActiveVid) return;
-  var id = currentActiveVid.id;
-  var req = currentActiveVid.required_ads || 1;
-  state.progress[id] = (state.progress[id] || 0) + 1;
-
-  if (state.progress[id] >= req) {
+function doUnlock(){
+  if(!currentVid) return;
+  var id = currentVid.id;
+  var req = currentVid.required_ads||1;
+  state.progress[id] = (state.progress[id]||0)+1;
+  if(state.progress[id] >= req){
     state.unlocked[id] = true;
     delete state.progress[id];
-    showToast('ভিডিও আনলক হয়েছে! 🎉');
-  } else {
-    showToast('বিজ্ঞাপন দেখা হয়েছে!');
+    toast('ভিডিও আনলক হয়েছে! 🎉');
+  }else{
+    toast('বিজ্ঞাপন দেখা হয়েছে');
   }
-  saveState();
+  save();
   renderAll();
   openDetail(id);
 }
 
-function saveVideo() {
-  var title = (document.getElementById('av-title') || {}).value || '';
-  var catId = (document.getElementById('av-cat') || {}).value || '';
-  var ads = parseInt((document.getElementById('av-ads') || {}).value) || 1;
-
-  if (!title.trim()) {
-    showToast('শিরোনাম দিন');
-    return;
+function buyPremium(){
+  if(confirm('VIP মেম্বারশিপ নিতে চান?')){
+    state.vipMembers[user.id] = true;
+    save();
+    renderProfile();
+    renderAll();
+    toast('VIP অ্যাক্টিভ হয়েছে 👑');
   }
+}
 
-  var newVid = {
-    id: 'v_' + Date.now(),
-    title: title.trim(),
-    category_id: catId,
-    required_ads: ads,
-    link: '',
-    thumb: '',
-    views: {}
-  };
+// Admin
+function switchAdminTab(tab, btn){
+  document.getElementById('admin-vids').classList.add('hidden');
+  document.getElementById('admin-links').classList.add('hidden');
+  document.getElementById('admin-cats').classList.add('hidden');
+  document.getElementById('admin-'+tab).classList.remove('hidden');
+  if(btn && btn.parentElement){
+    btn.parentElement.querySelectorAll('.cat-pill').forEach(function(p){p.classList.remove('active');});
+    btn.classList.add('active');
+  }
+}
 
-  state.videos.push(newVid);
-  saveState();
+function saveVideo(){
+  var title = (document.getElementById('av-title')||{}).value||'';
+  var cat = (document.getElementById('av-cat')||{}).value||'';
+  var link = (document.getElementById('av-link')||{}).value||'';
+  var thumb = (document.getElementById('av-thumb')||{}).value||'';
+  var ads = parseInt((document.getElementById('av-ads')||{}).value)||1;
+  var editId = (document.getElementById('av-edit-id')||{}).value;
+
+  if(!title.trim()){ toast('শিরোনাম দিন'); return; }
+
+  if(editId){
+    var v = state.videos.find(function(x){return x.id===editId;});
+    if(v){
+      v.title = title.trim();
+      v.category_id = cat;
+      v.link = link;
+      v.thumb = thumb;
+      v.required_ads = ads;
+    }
+    if(supabaseClient){
+      supabaseClient.from('videos').update(v).eq('id', editId).then(function(){});
+    }
+    toast('আপডেট হয়েছে');
+  }else{
+    var newVid = {
+      id: 'v_'+Date.now(),
+      title: title.trim(),
+      category_id: cat,
+      link: link,
+      thumb: thumb,
+      required_ads: ads,
+      views: {}
+    };
+    state.videos.push(newVid);
+    if(supabaseClient){
+      supabaseClient.from('videos').insert([newVid]).then(function(){});
+    }
+    toast('ভিডিও যোগ হয়েছে');
+  }
+  save();
   renderAll();
-  showToast('ভিডিও যোগ হয়েছে!');
+  document.getElementById('av-edit-id').value = '';
   document.getElementById('av-title').value = '';
+  document.getElementById('av-link').value = '';
+  document.getElementById('av-thumb').value = '';
+  document.getElementById('av-form-title').textContent = '➕ নতুন ভিডিও';
+  document.getElementById('av-btn').textContent = 'সেভ করুন';
 }
 
-function deleteVideo(id) {
-  if (!confirm('ভিডিও ডিলিট করতে চান?')) return;
-  state.videos = state.videos.filter(function(v){ return v.id !== id; });
-  saveState();
+function editVideo(id){
+  var v = state.videos.find(function(x){return x.id===id;});
+  if(!v) return;
+  document.getElementById('av-edit-id').value = v.id;
+  document.getElementById('av-title').value = v.title||'';
+  document.getElementById('av-cat').value = v.category_id||'';
+  document.getElementById('av-link').value = v.link||'';
+  document.getElementById('av-thumb').value = v.thumb||'';
+  document.getElementById('av-ads').value = v.required_ads||1;
+  document.getElementById('av-form-title').textContent = '✏️ ভিডিও এডিট';
+  document.getElementById('av-btn').textContent = 'আপডেট করুন';
+  switchAdminTab('vids', document.querySelector('#view-admin .cat-pill'));
+}
+
+function deleteVideo(id){
+  if(!confirm('ডিলিট করবেন?')) return;
+  state.videos = state.videos.filter(function(v){return v.id!==id;});
+  if(supabaseClient) supabaseClient.from('videos').delete().eq('id', id).then(function(){});
+  save();
   renderAll();
-  showToast('ডিলিট হয়েছে');
+  toast('ডিলিট হয়েছে');
 }
 
-function openExternal(url) {
-  if (!url) return;
-  if (url.indexOf('http') !== 0) url = 'https://' + url;
-  if (tg.openLink) tg.openLink(url);
-  else window.open(url, '_blank');
+function saveLink(){
+  var title = (document.getElementById('al-title')||{}).value||'';
+  var url = (document.getElementById('al-url')||{}).value||'';
+  if(!title.trim()||!url.trim()){ toast('সব ফিল্ড পূরণ করুন'); return; }
+  if(!state.viralLinks) state.viralLinks = [];
+  var obj = {id:'l_'+Date.now(), title:title.trim(), url:url.trim()};
+  state.viralLinks.push(obj);
+  if(supabaseClient) supabaseClient.from('viral_links').insert([obj]).then(function(){});
+  save();
+  renderAll();
+  toast('লিংক যোগ হয়েছে');
+  document.getElementById('al-title').value = '';
+  document.getElementById('al-url').value = '';
 }
 
-function showToast(msg) {
+function deleteLink(id){
+  if(!confirm('ডিলিট?')) return;
+  state.viralLinks = state.viralLinks.filter(function(l){return l.id!==id;});
+  if(supabaseClient) supabaseClient.from('viral_links').delete().eq('id', id).then(function(){});
+  save();
+  renderAll();
+  toast('ডিলিট হয়েছে');
+}
+
+function saveCategory(){
+  var name = (document.getElementById('ac-name')||{}).value||'';
+  if(!name.trim()){ toast('নাম দিন'); return; }
+  var obj = {id:'cat_'+Date.now(), name:name.trim()};
+  state.categories.push(obj);
+  if(supabaseClient) supabaseClient.from('categories').insert([obj]).then(function(){});
+  save();
+  renderCategories();
+  renderAdmin();
+  toast('ক্যাটাগরি যোগ হয়েছে');
+  document.getElementById('ac-name').value = '';
+}
+
+function deleteCategory(id){
+  if(id==='cat_all') return;
+  if(!confirm('ডিলিট?')) return;
+  state.categories = state.categories.filter(function(c){return c.id!==id;});
+  if(currentCat===id) currentCat = 'cat_all';
+  if(supabaseClient) supabaseClient.from('categories').delete().eq('id', id).then(function(){});
+  save();
+  renderCategories();
+  renderAll();
+  toast('ডিলিট হয়েছে');
+}
+
+function openUrl(url){
+  if(!url) return;
+  if(url.indexOf('http')!==0) url = 'https://'+url;
+  if(tg.openLink) tg.openLink(url);
+  else window.open(url,'_blank');
+}
+
+function toast(msg){
   var box = document.getElementById('toast-box');
-  if (!box) return;
+  if(!box) return;
   var t = document.createElement('div');
   t.className = 'toast-item';
-  t.innerHTML = '<span>ℹ️</span> ' + escapeHtml(msg);
+  t.innerHTML = '<span>ℹ️</span> '+esc(msg);
   box.appendChild(t);
-  setTimeout(function(){ t.remove(); }, 3000);
+  setTimeout(function(){ t.remove(); }, 2800);
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+function esc(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ========== শুরু ==========
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
+// Start
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+}else{
+  init();
 }
 </script>
 </body>
-</html>
+  </html>
