@@ -97,6 +97,8 @@
   .profile-id-pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface-light);border:1px solid var(--border);padding:7px 16px;border-radius:30px;font-size:12px;font-weight:700;color:#fff}
 
   .premium-banner{background:linear-gradient(135deg,#f59e0b 0%,#ec4899 100%);border-radius:20px;padding:20px;margin-bottom:20px;color:#fff;box-shadow:0 10px 25px rgba(245,158,11,0.3)}
+  .copy-btn{cursor:pointer;color:#fff;background:rgba(0,0,0,0.25);padding:2px 8px;border-radius:6px;font-weight:bold;display:inline-block;transition:0.2s}
+  .copy-btn:active{background:rgba(0,0,0,0.5)}
 
   .profile-menu-list{background:var(--surface);border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-bottom:20px}
   .profile-menu-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer}
@@ -295,7 +297,7 @@
     <div class="premium-banner" id="prem-banner-box">
       <div>
         <h4 style="font-size:16px;font-weight:800;margin-bottom:4px">👑 VIP প্রিমিয়াম মেম্বারশিপ</h4>
-        <p style="font-size:12px;opacity:0.9;margin-bottom:10px">বিকাশ বা নগদে **01873555155** নাম্বারে পেমেন্ট করে ট্রানজেকশন আইডি দিন, অ্যাডমিন আপনার অ্যাকাউন্ট VIP করে দেবেন!</p>
+        <p style="font-size:12px;opacity:0.9;margin-bottom:10px">বিকাশ বা নগদে <span class="copy-btn" onclick="copyToClipboard('01873555155')">01873555155 📋</span> নাম্বারে পেমেন্ট করে ট্রানজেকশন আইডি দিন, অ্যাডমিন চেক করে আপনার অ্যাকাউন্ট VIP করে দেবেন!</p>
         <div style="display:flex;gap:8px;">
           <input type="text" id="trx-input" placeholder="TrxID দিন..." style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.2);padding:8px 12px;border-radius:10px;color:#fff;font-size:12px;width:100%;outline:none"/>
           <button class="btn" style="width:auto;padding:8px 14px;background:#fff;color:var(--primary);box-shadow:none;font-size:12px" onclick="submitTrx()">জমা দিন</button>
@@ -325,6 +327,7 @@
 
   <div class="cat-scroll" style="padding:0;margin-bottom:16px">
     <button class="cat-pill active" onclick="switchAdminSub('vids',this)">ভিডিও আপলোড</button>
+    <button class="cat-pill" onclick="switchAdminSub('pay',this)">পেমেন্ট রিকোয়েস্ট</button>
     <button class="cat-pill" onclick="switchAdminSub('viral',this)">ভাইরাল লিংক</button>
     <button class="cat-pill" onclick="switchAdminSub('cats',this)">ক্যাটাগরি</button>
   </div>
@@ -341,6 +344,11 @@
       <button class="btn btn-primary" id="upload-btn" onclick="saveVideo()">ক্লাউডে আপলোড করুন</button>
     </div>
     <div id="admin-vid-list"></div>
+  </div>
+
+  <div class="admin-subview hidden" id="admin-sub-pay">
+    <h4 style="font-size:15px;font-weight:800;margin-bottom:12px;color:#fff">💳 ইউজারের পেমেন্ট রিকোয়েস্ট লিস্ট</h4>
+    <div id="admin-payment-list"></div>
   </div>
 
   <div class="admin-subview hidden" id="admin-sub-viral">
@@ -439,11 +447,11 @@ let state = {
   reactions: {},
   comments: {},
   history: [],
-  vipMembers: {}
+  vipMembers: {},
+  paymentRequests: []
 };
 
 let tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : {};
-// Telegram সিগনেচার যাচাইয়ের জন্য initData প্যারামিটার ব্যবহার নিশ্চিত করা হয়েছে
 let initData = tg.initData || '';
 let user = (tg.initDataUnsafe && tg.initDataUnsafe.user) ? tg.initDataUnsafe.user : { id: 6377295796, first_name: 'Md Janina', username: 'admin', photo_url: '' };
 
@@ -475,6 +483,14 @@ function showCustomConfirm(title, message, onConfirm) {
   const cleanup = () => { modal.classList.remove('open'); okBtn.onclick = null; cancelBtn.onclick = null; };
   okBtn.onclick = () => { cleanup(); onConfirm(); };
   cancelBtn.onclick = () => { cleanup(); };
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('নম্বারটি কপি হয়েছে: ' + text, 'success');
+  }).catch(() => {
+    showToast('কপি করা সম্ভব হয়নি!', 'danger');
+  });
 }
 
 async function initApp() {
@@ -510,19 +526,17 @@ async function initApp() {
 async function loadDataFromCloud() {
   if (!supabaseClient) return;
   try {
-    // সেশন ক্যাশ সমস্যা এড়াতে এবং সবসময় লেটেস্ট ডেটা পেতে সরাসরি ডাটাবেজ থেকে কুয়েরি করা হচ্ছে
-    const [v, c, l, f, com, vip] = await Promise.allSettled([
+    const [v, c, l, f, com, vip, pay] = await Promise.allSettled([
       withTimeout(supabaseClient.from('videos').select('*'), 3000),
       withTimeout(supabaseClient.from('categories').select('*'), 3000),
       withTimeout(supabaseClient.from('viral_links').select('*'), 3000),
       withTimeout(supabaseClient.from('user_favorites').select('*').eq('user_id', user.id), 3000),
       withTimeout(supabaseClient.from('video_comments').select('*'), 3000),
-      withTimeout(supabaseClient.from('vip_users').select('*').eq('user_id', user.id), 3000)
+      withTimeout(supabaseClient.from('vip_users').select('*').eq('user_id', user.id), 3000),
+      withTimeout(supabaseClient.from('payment_requests').select('*'), 3000)
     ]);
     
-    if (v.status === 'fulfilled' && v.value && v.value.data) {
-      state.videos = v.value.data;
-    }
+    if (v.status === 'fulfilled' && v.value && v.value.data) state.videos = v.value.data;
     if (c.status === 'fulfilled' && c.value && c.value.data && c.value.data.length) {
       let cats = c.value.data;
       if (!cats.some(x => x.id === 'cat_all')) cats.unshift({ id: 'cat_all', name: 'All' });
@@ -530,13 +544,11 @@ async function loadDataFromCloud() {
     }
     if (l.status === 'fulfilled' && l.value && l.value.data) state.viralLinks = l.value.data;
     
-    // ফেভারিট ক্লাউড সিঙ্ক
     if (f.status === 'fulfilled' && f.value && f.value.data) {
       state.favorites = {};
       f.value.data.forEach(item => { state.favorites[item.video_id] = true; });
     }
 
-    // কমেন্টস ক্লাউড সিঙ্ক
     if (com.status === 'fulfilled' && com.value && com.value.data) {
       state.comments = {};
       com.value.data.forEach(item => {
@@ -545,9 +557,12 @@ async function loadDataFromCloud() {
       });
     }
 
-    // VIP মেম্বারশিপ ক্লাউড চেক
     if (vip.status === 'fulfilled' && vip.value && vip.value.data && vip.value.data.length > 0) {
       state.vipMembers[user.id] = true;
+    }
+
+    if (pay.status === 'fulfilled' && pay.value && pay.value.data) {
+      state.paymentRequests = pay.value.data;
     }
   } catch(e) {}
 }
@@ -839,14 +854,65 @@ function handleAdSuccess(vidId) {
   updateModalUI(v);
 }
 
-function submitTrx() {
+// পেমেন্ট রিকোয়েস্ট সরাসরি অ্যাডমিনের কাছে পাঠানোর ফাংশন
+async function submitTrx() {
   const trx = (document.getElementById('trx-input') || {}).value || '';
-  if (!trx.trim()) return showToast('ট্রানজেকশন আইডি দিন');
-  showToast('পেমেন্ট রিকোয়েস্ট জমা হয়েছে! অ্যাডমিন চেক করে VIP অ্যাক্টিভ করে দেবেন।', 'success');
+  if (!trx.trim()) return showToast('দয়া করে ট্রানজেকশন আইডি দিন');
+  
+  const paymentObj = {
+    id: 'pay_' + Date.now(),
+    user_id: user.id,
+    user_name: user.first_name || 'User',
+    trx_id: trx.trim(),
+    created_at: new Date().toISOString()
+  };
+
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('payment_requests').insert([paymentObj]);
+    } catch(e) {}
+  }
+
+  if (!state.paymentRequests) state.paymentRequests = [];
+  state.paymentRequests.unshift(paymentObj);
+  saveState();
+
+  showToast('পেমেন্ট রিকোয়েস্ট অ্যাডমিনের কাছে পাঠানো হয়েছে! ✅', 'success');
   document.getElementById('trx-input').value = '';
 }
 
-// অ্যাডমিন সিকিউরিটি ও পাসওয়ার্ড যাচাই ফাংশন
+// অ্যাডমিন কর্তৃক ইউজারের পেমেন্ট ভেরিফাই করে VIP অ্যাক্টিভ করার ফাংশন
+async function approveVip(userId, reqId) {
+  if (Number(user.id) !== ADMIN_ID) return;
+  
+  state.vipMembers[userId] = true;
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('vip_users').insert([{ user_id: userId }]);
+      await supabaseClient.from('payment_requests').delete().eq('id', reqId);
+    } catch(e) {}
+  }
+
+  state.paymentRequests = (state.paymentRequests || []).filter(r => r.id !== reqId);
+  saveState();
+  renderAdmin();
+  showToast('ইউজারের VIP মেম্বারশিপ সফলভাবে অ্যাক্টিভ করা হয়েছে! 👑', 'success');
+}
+
+// পেমেন্ট রিকোয়েস্ট ডিলিট বা রিজেক্ট করার ফাংশন
+async function rejectVip(reqId) {
+  if (Number(user.id) !== ADMIN_ID) return;
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('payment_requests').delete().eq('id', reqId);
+    } catch(e) {}
+  }
+  state.paymentRequests = (state.paymentRequests || []).filter(r => r.id !== reqId);
+  saveState();
+  renderAdmin();
+  showToast('পেমেন্ট রিকোয়েস্ট মুছে ফেলা হয়েছে।', 'info');
+}
+
 function requestAdminAccess() {
   if (Number(user.id) !== ADMIN_ID) {
     return showToast('আপনার অ্যাডমিন অ্যাক্সেস নেই!', 'danger');
@@ -885,7 +951,6 @@ async function saveVideo() {
   try {
     let videoUrl = '';
     let thumbUrl = '';
-    // ডুপ্লিকেট আপলোড এড়াতে ফাইলের নামের সাথে টাইমস্ট্যাম্প ও র‍্যান্ডম স্ট্রিং যুক্ত করা হয়েছে
     const unique = Date.now() + '_' + Math.random().toString(36).substring(2, 8);
 
     if (supabaseClient) {
@@ -1040,6 +1105,27 @@ function renderAdmin() {
       '<div class="admin-list-row"><div style="font-size:12px;font-weight:700;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(v.title) + '</div><div style="display:flex;gap:6px"><button class="btn btn-ghost" style="width:auto;padding:6px 10px;font-size:11px" onclick="editVideo(\'' + v.id + '\')">এডিট</button><button class="btn btn-danger" style="width:auto;padding:6px 10px;font-size:11px" onclick="deleteVideo(\'' + v.id + '\')">ডিলিট</button></div></div>'
     ).join('');
   }
+
+  // পেমেন্ট রিকোয়েস্ট লিস্ট রেন্ডার
+  const payList = document.getElementById('admin-payment-list');
+  if (payList) {
+    const pays = state.paymentRequests || [];
+    if (!pays.length) {
+      payList.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13px">কোনো পেমেন্ট রিকোয়েস্ট নেই</div>';
+    } else {
+      payList.innerHTML = pays.map(p => 
+        '<div class="admin-list-row" style="flex-direction:column;align-items:flex-start;gap:8px">' +
+          '<div style="width:100%;display:flex;justify-content:space-between"><b>👤 ' + escapeHtml(p.user_name) + '</b><span style="font-size:11px;color:var(--muted)">ID: ' + p.user_id + '</span></div>' +
+          '<div style="width:100%;font-size:12px">TrxID: <span style="color:var(--warning);font-weight:bold">' + escapeHtml(p.trx_id) + '</span></div>' +
+          '<div style="width:100%;display:flex;gap:8px;margin-top:4px">' +
+            '<button class="btn btn-success" style="padding:6px;font-size:11px" onclick="approveVip(\'' + p.user_id + '\', \'' + p.id + '\')">VIP দিন</button>' +
+            '<button class="btn btn-danger" style="padding:6px;font-size:11px" onclick="rejectVip(\'' + p.id + '\')">বাতিল</button>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+  }
+
   const viralList = document.getElementById('admin-viral-list');
   if (viralList) {
     viralList.innerHTML = (state.viralLinks || []).map(l => 
@@ -1103,7 +1189,6 @@ function showView(id) {
 function switchCat(id) { currentCat = id; renderCategories(); renderHome(); }
 function handleSearch() { renderHome(); }
 
-// ক্লাউডে ফেভারিট সেভ ও সিঙ্ক করার ফাংশন
 async function toggleFav(id) {
   state.favorites[id] = !state.favorites[id];
   saveState();
@@ -1150,7 +1235,6 @@ function renderComments(vidId) {
   ).join('');
 }
 
-// ক্লাউডে কমেন্টস সেভ করার ফাংশন
 async function postComment() {
   const input = document.getElementById('md-comment-input');
   const text = (input || {}).value || '';
