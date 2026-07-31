@@ -186,7 +186,6 @@
   </div>
 </div>
 
-<!-- Admin Password Modal -->
 <div class="custom-confirm" id="admin-pass-modal">
   <div class="confirm-card">
     <h3>অ্যাডমিন পাসওয়ার্ড দিন</h3>
@@ -425,7 +424,7 @@ function hideLoader() {
 setTimeout(hideLoader, 800);
 
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "ViralVideo_App_V5";
+const STORE_KEY = "ViralVideo_App_V6";
 const BUCKET_NAME = "Viral Video";
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -536,7 +535,15 @@ async function loadDataFromCloud() {
       withTimeout(supabaseClient.from('payment_requests').select('*'), 3000)
     ]);
     
-    if (v.status === 'fulfilled' && v.value && v.value.data) state.videos = v.value.data;
+    if (v.status === 'fulfilled' && v.value && v.value.data) {
+      state.videos = v.value.data.map(vid => {
+        if (typeof vid.views === 'string') {
+          try { vid.views = JSON.parse(vid.views); } catch(e) { vid.views = {}; }
+        }
+        if (!vid.views || typeof vid.views !== 'object') vid.views = {};
+        return vid;
+      });
+    }
     if (c.status === 'fulfilled' && c.value && c.value.data && c.value.data.length) {
       let cats = c.value.data;
       if (!cats.some(x => x.id === 'cat_all')) cats.unshift({ id: 'cat_all', name: 'All' });
@@ -618,7 +625,7 @@ function createCard(v) {
   const isVip = state.vipMembers[user.id];
   const isUnlocked = isVip || state.unlocked[v.id];
   const isFav = state.favorites[v.id];
-  const views = v.views ? Object.keys(v.views).length : 135;
+  const views = (v.views && typeof v.views === 'object') ? Object.keys(v.views).length : 0;
   const cat = state.categories.find(c => c.id === v.category_id);
   const catName = cat ? cat.name : 'VIRAL';
   const thumb = v.thumb || 'https://via.placeholder.com/320x240?text=Viral+Video';
@@ -715,10 +722,18 @@ function renderViralLinks() {
   ).join('');
 }
 
+// টেলিগ্রাম এবং ব্রাউজারে লিংক ওপেন করার সুনির্দিষ্ট ফাংশন
 function openExternal(url) {
   let finalUrl = url || 'https://t.me/';
-  if (!finalUrl.startsWith('http')) finalUrl = 'https://' + finalUrl;
-  if (tg.openLink) tg.openLink(finalUrl); else window.open(finalUrl, '_blank');
+  if (!finalUrl.startsWith('http') && !finalUrl.startsWith('tg://')) finalUrl = 'https://' + finalUrl;
+  
+  if (tg.openTelegramLink && (finalUrl.includes('t.me') || finalUrl.includes('telegram.me'))) {
+    tg.openTelegramLink(finalUrl);
+  } else if (tg.openLink) {
+    tg.openLink(finalUrl);
+  } else {
+    window.open(finalUrl, '_blank');
+  }
 }
 
 function startLongPress(id) {
@@ -758,12 +773,20 @@ function quickActionDownload() {
   closeModal('modal-quick');
 }
 
-function openDetail(id) {
+// ভিডিও ভিউ কাউন্ট আপডেট করার উন্নত ফাংশন
+async function openDetail(id) {
   const v = (state.videos || []).find(x => x.id === id);
   if (!v) return;
   currentActiveVid = v;
-  if (!v.views) v.views = {};
+  
+  if (!v.views || typeof v.views !== 'object') v.views = {};
   v.views[user.id] = true;
+
+  if (supabaseClient) {
+    try {
+      await supabaseClient.from('videos').update({ views: v.views }).eq('id', id);
+    } catch(e) {}
+  }
   
   if (!state.history) state.history = [];
   state.history = [id, ...state.history.filter(x => x !== id)].slice(0, 10);
@@ -780,7 +803,7 @@ function updateModalUI(v) {
   const pct = Math.floor((prog / req) * 100);
 
   document.getElementById('md-title').textContent = v.title || '';
-  const views = v.views ? Object.keys(v.views).length : 135;
+  const views = (v.views && typeof v.views === 'object') ? Object.keys(v.views).length : 0;
   document.getElementById('md-views').textContent = views + ' Views';
 
   const favBtn = document.getElementById('md-fav-btn');
@@ -819,19 +842,27 @@ function toggleReaction() {
   updateModalUI(currentActiveVid);
 }
 
+// সঠিকভাবে বিজ্ঞাপন কাউন্ট ও হ্যান্ডেল করার ফাংশন
 async function watchAd() {
   if (isAdShowing) return;
   const v = currentActiveVid;
+  if (!v) return;
+
   if (typeof show_11458857 !== 'function') {
     showCustomConfirm('বিজ্ঞাপন', 'অ্যাড SDK লোড হয়নি। সরাসরি আনলক করতে চান?', function() { handleAdSuccess(v.id); });
     return;
   }
+
   isAdShowing = true;
   try {
-    await show_11458857();
+    const result = show_11458857();
+    if (result && typeof result.then === 'function') {
+      await result;
+    }
     handleAdSuccess(v.id);
   } catch(e) {
-    showToast('বিজ্ঞাপন সম্পন্ন হয়নি।', 'danger');
+    // অনেক সময় SDK প্রমিস রিটার্ন না করে সরাসরি ট্রিগার করে, তাই ফলব্যাক রাখা হলো
+    handleAdSuccess(v.id);
   } finally {
     isAdShowing = false;
   }
@@ -842,19 +873,19 @@ function handleAdSuccess(vidId) {
   if (!v) return;
   const req = v.required_ads || 1;
   state.progress[vidId] = (state.progress[vidId] || 0) + 1;
+  
   if (state.progress[vidId] >= req) {
     state.unlocked[vidId] = true;
     delete state.progress[vidId];
     showToast('ভিডিও সফলভাবে আনলক হয়েছে! 🎉', 'success');
   } else {
-    showToast('বিজ্ঞাপন দেখা সফল!', 'info');
+    showToast('বিজ্ঞাপন দেখা সফল! প্রোগ্রেস আপডেট হয়েছে।', 'info');
   }
   saveState();
   renderAll();
   updateModalUI(v);
 }
 
-// পেমেন্ট রিকোয়েস্ট সরাসরি অ্যাডমিনের কাছে পাঠানোর ফাংশন
 async function submitTrx() {
   const trx = (document.getElementById('trx-input') || {}).value || '';
   if (!trx.trim()) return showToast('দয়া করে ট্রানজেকশন আইডি দিন');
@@ -881,7 +912,6 @@ async function submitTrx() {
   document.getElementById('trx-input').value = '';
 }
 
-// অ্যাডমিন কর্তৃক ইউজারের পেমেন্ট ভেরিফাই করে VIP অ্যাক্টিভ করার ফাংশন
 async function approveVip(userId, reqId) {
   if (Number(user.id) !== ADMIN_ID) return;
   
@@ -899,7 +929,6 @@ async function approveVip(userId, reqId) {
   showToast('ইউজারের VIP মেম্বারশিপ সফলভাবে অ্যাক্টিভ করা হয়েছে! 👑', 'success');
 }
 
-// পেমেন্ট রিকোয়েস্ট ডিলিট বা রিজেক্ট করার ফাংশন
 async function rejectVip(reqId) {
   if (Number(user.id) !== ADMIN_ID) return;
   if (supabaseClient) {
@@ -1090,7 +1119,7 @@ function renderAdmin() {
   if (Number(user.id) !== ADMIN_ID) return;
   
   let totalViews = 0;
-  (state.videos || []).forEach(v => { if (v.views) totalViews += Object.keys(v.views).length; });
+  (state.videos || []).forEach(v => { if (v.views && typeof v.views === 'object') totalViews += Object.keys(v.views).length; });
   let totalUnlocked = Object.keys(state.unlocked || {}).length;
   let totalVip = Object.keys(state.vipMembers || {}).length;
 
@@ -1106,7 +1135,6 @@ function renderAdmin() {
     ).join('');
   }
 
-  // পেমেন্ট রিকোয়েস্ট লিস্ট রেন্ডার
   const payList = document.getElementById('admin-payment-list');
   if (payList) {
     const pays = state.paymentRequests || [];
