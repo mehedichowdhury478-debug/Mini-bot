@@ -254,16 +254,6 @@
 <div class="cat-scroll" id="category-tabs"></div>
 
 <section class="view active" id="view-home">
-  <div id="trending-section" class="hidden">
-    <h3 class="section-title">🔥 ট্রেন্ডিং ও জনপ্রিয়</h3>
-    <div class="video-grid" id="trending-grid" style="margin-bottom:20px"></div>
-  </div>
-
-  <div id="continue-section" class="hidden">
-    <h3 class="section-title">⏱️ আবার দেখুন (History)</h3>
-    <div class="video-grid" id="continue-grid" style="margin-bottom:20px"></div>
-  </div>
-
   <h3 class="section-title">📹 সকল ভিডিও</h3>
   <div class="video-grid" id="main-grid"></div>
 </section>
@@ -276,6 +266,11 @@
 <section class="view" id="view-tutorial">
   <h3 class="section-title">🔓 আনলক করা ভিডিও</h3>
   <div class="video-grid" id="tutorial-grid"></div>
+</section>
+
+<section class="view" id="view-history">
+  <h3 class="section-title">⏱️ আবার দেখুন (History)</h3>
+  <div class="video-grid" id="history-grid"></div>
 </section>
 
 <section class="view" id="view-links">
@@ -307,12 +302,10 @@
     <div class="profile-menu-list">
       <div class="profile-menu-item" onclick="showView('fav')"><div class="menu-item-left"><span>❤️</span><span>Favorites</span></div><span>›</span></div>
       <div class="profile-menu-item" onclick="showView('tutorial')"><div class="menu-item-left"><span>🔓</span><span>Unlocked Videos</span></div><span>›</span></div>
-      <div class="profile-menu-item" onclick="exportData()"><div class="menu-item-left"><span>📥</span><span>Backup Download</span></div><span>›</span></div>
-      <div class="profile-menu-item" onclick="triggerImport()"><div class="menu-item-left"><span>📤</span><span>Backup Restore (Import)</span></div><span>›</span></div>
+      <div class="profile-menu-item" onclick="showView('history')"><div class="menu-item-left"><span>⏱️</span><span>History (আবার দেখুন)</span></div><span>›</span></div>
     </div>
   </div>
 </section>
-<input type="file" id="import-file-input" style="display:none" accept=".json" onchange="importData(event)"/>
 
 <section class="view" id="view-admin">
   <h3 class="section-title">🛠 অ্যাডমিন ড্যাশবোর্ড</h3>
@@ -424,7 +417,7 @@ function hideLoader() {
 setTimeout(hideLoader, 800);
 
 const ADMIN_ID = 6377295796;
-const STORE_KEY = "ViralVideo_App_V6";
+const STORE_KEY = "ViralVideo_App_V7";
 const BUCKET_NAME = "Viral Video";
 const SUPABASE_URL = 'https://vxlkbtfauaccmfvukrvk.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4bGtidGZhdWFjY21mdnVrcnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzOTQ2ODMsImV4cCI6MjEwMDk3MDY4M30.jFCEixDBcCUgnArbm0fiBi98V68SGwyL2QEragr9_gk';
@@ -486,7 +479,7 @@ function showCustomConfirm(title, message, onConfirm) {
 
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(() => {
-    showToast('নম্বারটি কপি হয়েছে: ' + text, 'success');
+    showToast('কপি করা হয়েছে: ' + text, 'success');
   }).catch(() => {
     showToast('কপি করা সম্ভব হয়নি!', 'danger');
   });
@@ -647,6 +640,7 @@ function renderAll() {
   renderHome();
   renderFavs();
   renderTutorial();
+  renderHistory();
   renderViralLinks();
   renderAdmin();
 }
@@ -658,26 +652,6 @@ function renderHome() {
   let vids = state.videos || [];
   if (currentCat !== 'cat_all') vids = vids.filter(v => v.category_id === currentCat);
   if (q.trim()) vids = vids.filter(v => (v.title || '').toLowerCase().includes(q.toLowerCase()));
-  
-  const trendingSec = document.getElementById('trending-section');
-  const trendingGrid = document.getElementById('trending-grid');
-  if (vids.length > 0 && !q.trim() && currentCat === 'cat_all') {
-    trendingSec.classList.remove('hidden');
-    const sorted = [...vids].sort((a,b) => (Object.keys(b.views || {}).length) - (Object.keys(a.views || {}).length));
-    trendingGrid.innerHTML = sorted.slice(0, 2).map(createCard).join('');
-  } else {
-    trendingSec.classList.add('hidden');
-  }
-
-  const continueSec = document.getElementById('continue-section');
-  const continueGrid = document.getElementById('continue-grid');
-  const historyVids = (state.history || []).map(id => state.videos.find(v => v.id === id)).filter(Boolean);
-  if (historyVids.length > 0 && !q.trim() && currentCat === 'cat_all') {
-    continueSec.classList.remove('hidden');
-    continueGrid.innerHTML = historyVids.slice(0, 2).map(createCard).join('');
-  } else {
-    continueSec.classList.add('hidden');
-  }
 
   if (vids.length) {
     grid.innerHTML = vids.map(createCard).join('');
@@ -708,6 +682,17 @@ function renderTutorial() {
   }
 }
 
+function renderHistory() {
+  const grid = document.getElementById('history-grid');
+  if (!grid) return;
+  const historyVids = (state.history || []).map(id => state.videos.find(v => v.id === id)).filter(Boolean);
+  if (historyVids.length) {
+    grid.innerHTML = historyVids.map(createCard).join('');
+  } else {
+    grid.innerHTML = `<div class="empty-state"><div class="empty-icon">⏱️</div><div class="empty-text">ইতিহাসে কোনো<br>ভিডিও নেই</div></div>`;
+  }
+}
+
 function renderViralLinks() {
   const cont = document.getElementById('viral-links-container');
   if (!cont) return;
@@ -722,7 +707,6 @@ function renderViralLinks() {
   ).join('');
 }
 
-// টেলিগ্রাম এবং ব্রাউজারে লিংক ওপেন করার সুনির্দিষ্ট ফাংশন
 function openExternal(url) {
   let finalUrl = url || 'https://t.me/';
   if (!finalUrl.startsWith('http') && !finalUrl.startsWith('tg://')) finalUrl = 'https://' + finalUrl;
@@ -762,7 +746,10 @@ function quickActionFav() {
 function quickActionShare() {
   if (!longPressVidId) return;
   const v = state.videos.find(x => x.id === longPressVidId);
-  if (v && tg.switchInlineQuery) tg.switchInlineQuery('Check out this video: ' + v.title);
+  if (v) {
+    const shareText = (v.title || '') + '\n' + (v.link || '');
+    copyToClipboard(shareText);
+  }
   closeModal('modal-quick');
 }
 
@@ -773,7 +760,6 @@ function quickActionDownload() {
   closeModal('modal-quick');
 }
 
-// ভিডিও ভিউ কাউন্ট আপডেট করার উন্নত ফাংশন
 async function openDetail(id) {
   const v = (state.videos || []).find(x => x.id === id);
   if (!v) return;
@@ -842,7 +828,6 @@ function toggleReaction() {
   updateModalUI(currentActiveVid);
 }
 
-// সঠিকভাবে বিজ্ঞাপন কাউন্ট ও হ্যান্ডেল করার ফাংশন
 async function watchAd() {
   if (isAdShowing) return;
   const v = currentActiveVid;
@@ -861,7 +846,6 @@ async function watchAd() {
     }
     handleAdSuccess(v.id);
   } catch(e) {
-    // অনেক সময় SDK প্রমিস রিটার্ন না করে সরাসরি ট্রিগার করে, তাই ফলব্যাক রাখা হলো
     handleAdSuccess(v.id);
   } finally {
     isAdShowing = false;
@@ -956,7 +940,7 @@ function closeAdminPassModal() {
 
 function verifyAdminPassword() {
   const pass = document.getElementById('admin-pass-input').value;
-  if (pass === 'Mehedi4785') {
+  if (pass === '478599') {
     closeAdminPassModal();
     showView('admin');
   } else {
@@ -1281,42 +1265,13 @@ async function postComment() {
   renderComments(currentActiveVid.id);
 }
 
-function exportData() {
-  const data = JSON.stringify({ unlocked: state.unlocked, favorites: state.favorites, vipMembers: state.vipMembers }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'backup.json';
-  a.click();
-}
-
-function triggerImport() {
-  const el = document.getElementById('import-file-input');
-  if (el) el.click();
-}
-
-function importData(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      if (parsed.unlocked) state.unlocked = Object.assign({}, state.unlocked, parsed.unlocked);
-      if (parsed.favorites) state.favorites = Object.assign({}, state.favorites, parsed.favorites);
-      if (parsed.vipMembers) state.vipMembers = Object.assign({}, state.vipMembers, parsed.vipMembers);
-      saveState();
-      renderAll();
-      showToast('ব্যাকআপ সফলভাবে রিস্টোর হয়েছে! ✅', 'success');
-    } catch(err) {
-      showToast('ভুল ফাইল ফরম্যাট!', 'danger');
-    }
-  };
-  reader.readAsText(file);
-}
-
 function shareVideo() {
-  if (tg.switchInlineQuery) tg.switchInlineQuery('Check out this video!');
+  if (currentActiveVid) {
+    const shareText = (currentActiveVid.title || '') + '\n' + (currentActiveVid.link || '');
+    copyToClipboard(shareText);
+  } else if (tg.switchInlineQuery) {
+    tg.switchInlineQuery('Check out this video!');
+  }
 }
 
 let touchStartY = 0;
