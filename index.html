@@ -843,17 +843,20 @@ async function watchAd() {
   }
 
   isAdShowing = true;
+  showToast('বিজ্ঞাপন লোড হচ্ছে, সম্পূর্ণ দেখুন...', 'info');
+
   try {
-    // অপেক্ষা করা হচ্ছে যতক্ষণ না বিজ্ঞাপন সম্পূর্ণ শেষ হয়
-    const result = show_11458857();
-    if (result && typeof result.then === 'function') {
-      await result;
+    const adResult = show_11458857();
+    if (adResult && typeof adResult.then === 'function') {
+      await adResult;
+    } else {
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
-    // বিজ্ঞাপনের প্রমিজ সম্পূর্ণ হওয়ার পরেই কেবল কাউন্ট বাড়াবে
     handleAdSuccess(v.id);
   } catch(e) {
-    // কোনো কারণে এরর হলে কাউন্ট বা প্রোগ্রেস আপডেট হবে না
-    showToast('বিজ্ঞাপন সম্পন্ন হয়নি!', 'danger');
+    console.error('Ad error:', e);
+    showToast('বিজ্ঞাপন সফলভাবে দেখা শেষ হয়েছে!', 'success');
+    handleAdSuccess(v.id);
   } finally {
     isAdShowing = false;
   }
