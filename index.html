@@ -849,13 +849,11 @@ async function watchAd() {
     const adResult = show_11458857();
     if (adResult && typeof adResult.then === 'function') {
       await adResult;
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 3000));
     }
+    // বিজ্ঞাপন দেখা শেষ হওয়ামাত্র ইনস্ট্যান্ট কাউন্ট আপডেট করা হবে
     handleAdSuccess(v.id);
   } catch(e) {
     console.error('Ad error:', e);
-    showToast('বিজ্ঞাপন সফলভাবে দেখা শেষ হয়েছে!', 'success');
     handleAdSuccess(v.id);
   } finally {
     isAdShowing = false;
