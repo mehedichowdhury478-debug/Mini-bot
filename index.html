@@ -1,997 +1,888 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <title>CourseLink BD</title>
-
-  <!-- Telegram Mini App -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    :root {
-      --primary: #229ed9;
-      --primary-dark: #168ac0;
-      --bg: #f4f7fa;
-      --card: #ffffff;
-      --text: #17212b;
-      --muted: #718096;
-      --border: #e8edf2;
-      --success: #16a34a;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-    }
-
-    body {
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding-bottom: 78px;
-    }
-
-    button,
-    input {
-      font-family: inherit;
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-    }
-
-    /* Header */
-
-    .header {
-      background: linear-gradient(135deg, #229ed9, #147db2);
-      color: white;
-      padding: 20px 16px 25px;
-      border-radius: 0 0 25px 25px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      background: rgba(255,255,255,.2);
-      border-radius: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-    }
-
-    .brand h2 {
-      font-size: 19px;
-    }
-
-    .brand small {
-      display: block;
-      opacity: .8;
-      font-size: 11px;
-      margin-top: 2px;
-    }
-
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: white;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-    }
-
-    .welcome h1 {
-      font-size: 25px;
-      margin-bottom: 5px;
-    }
-
-    .welcome p {
-      opacity: .85;
-      font-size: 13px;
-    }
-
-    /* Search */
-
-    .search-box {
-      margin-top: 18px;
-      position: relative;
-    }
-
-    .search-box input {
-      width: 100%;
-      height: 50px;
-      border: none;
-      border-radius: 15px;
-      padding: 0 45px 0 45px;
-      outline: none;
-      font-size: 14px;
-      background: white;
-      color: var(--text);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 15px;
-      font-size: 18px;
-    }
-
-    .clear-search {
-      position: absolute;
-      right: 13px;
-      top: 12px;
-      width: 27px;
-      height: 27px;
-      border-radius: 50%;
-      background: #eef2f5;
-      display: none;
-    }
-
-    /* Main */
-
-    .container {
-      max-width: 650px;
-      margin: auto;
-      padding: 18px 15px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .section-header h2 {
-      font-size: 18px;
-    }
-
-    .section-header span {
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    /* Categories */
-
-    .categories {
-      display: flex;
-      gap: 9px;
-      overflow-x: auto;
-      padding-bottom: 5px;
-      scrollbar-width: none;
-    }
-
-    .categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .category {
-      flex: 0 0 auto;
-      background: white;
-      border: 1px solid var(--border);
-      padding: 9px 15px;
-      border-radius: 30px;
-      font-size: 12px;
-      color: #536170;
-    }
-
-    .category.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    /* Courses */
-
-    .course-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .course-card {
-      background: white;
-      border-radius: 17px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      box-shadow: 0 3px 12px rgba(0,0,0,.035);
-      transition: .2s;
-    }
-
-    .course-card:active {
-      transform: scale(.98);
-    }
-
-    .course-image {
-      height: 125px;
-      position: relative;
-      overflow: hidden;
-      background: #e8f6fd;
-    }
-
-    .course-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .course-badge {
-      position: absolute;
-      top: 9px;
-      left: 9px;
-      background: rgba(0,0,0,.65);
-      color: white;
-      padding: 5px 8px;
-      border-radius: 7px;
-      font-size: 9px;
-    }
-
-    .course-content {
-      padding: 11px;
-    }
-
-    .course-title {
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1.35;
-      min-height: 38px;
-    }
-
-    .course-meta {
-      display: flex;
-      gap: 8px;
-      margin-top: 7px;
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .course-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 11px;
-    }
-
-    .price {
-      color: var(--primary);
-      font-size: 16px;
-      font-weight: 800;
-    }
-
-    .old-price {
-      color: #a0aec0;
-      font-size: 10px;
-      text-decoration: line-through;
-      margin-left: 3px;
-    }
-
-    .buy-btn {
-      background: var(--primary);
-      color: white;
-      padding: 8px 11px;
-      border-radius: 9px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    /* Empty */
-
-    .empty {
-      text-align: center;
-      padding: 50px 15px;
-      color: var(--muted);
-      display: none;
-    }
-
-    .empty-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
-
-    /* Bottom Navigation */
-
-    .bottom-nav {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 68px;
-      background: rgba(255,255,255,.96);
-      backdrop-filter: blur(15px);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .nav-item {
-      background: none;
-      color: #8a96a3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      min-width: 65px;
-    }
-
-    .nav-icon {
-      font-size: 20px;
-    }
-
-    .nav-item.active {
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    /* Pages */
-
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-    }
-
-    /* Back Header */
-
-    .page-header {
-      background: white;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      padding: 0 15px;
-      gap: 13px;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-
-    .back-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 12px;
-      background: #f1f5f8;
-      font-size: 20px;
-    }
-
-    .page-header h2 {
-      font-size: 17px;
-    }
-
-    /* Course Details */
-
-    .details-image {
-      width: 100%;
-      height: 220px;
-      object-fit: cover;
-    }
-
-    .details-content {
-      padding: 18px 15px;
-    }
-
-    .details-title {
-      font-size: 22px;
-      line-height: 1.35;
-      margin-bottom: 10px;
-    }
-
-    .details-info {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 18px;
-    }
-
-    .info-pill {
-      background: #edf8fd;
-      color: var(--primary);
-      padding: 7px 10px;
-      border-radius: 8px;
-      font-size: 11px;
-    }
-
-    .description {
-      font-size: 14px;
-      color: #5e6975;
-      line-height: 1.7;
-    }
-
-    .features {
-      margin-top: 20px;
-    }
-
-    .features h3 {
-      font-size: 16px;
-      margin-bottom: 12px;
-    }
-
-    .feature {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 10px 0;
-      font-size: 13px;
-    }
-
-    .check {
-      width: 25px;
-      height: 25px;
-      background: #eaf8ef;
-      color: var(--success);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .details-buy {
-      margin-top: 22px;
-      width: 100%;
-      height: 52px;
-      border-radius: 14px;
-      background: var(--primary);
-      color: white;
-      font-weight: 800;
-      font-size: 15px;
-    }
-
-    /* Payment */
-
-    .payment-card {
-      background: white;
-      margin-bottom: 12px;
-      border-radius: 16px;
-      padding: 15px;
-      border: 1px solid var(--border);
-    }
-
-    .order-course {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .order-course img {
-      width: 70px;
-      height: 55px;
-      border-radius: 9px;
-      object-fit: cover;
-    }
-
-    .order-course h3 {
-      font-size: 14px;
-    }
-
-    .order-course p {
-      margin-top: 4px;
-      font-size: 12px;
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .payment-methods {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .payment-method {
-      border: 2px solid var(--border);
-      background: white;
-      border-radius: 13px;
-      padding: 14px 10px;
-      text-align: center;
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .payment-method.selected {
-      border-color: var(--primary);
-      background: #eef9fe;
-      color: var(--primary);
-    }
-
-    .payment-number {
-      background: #f5f7f9;
-      border-radius: 11px;
-      padding: 13px;
-      margin-top: 13px;
-      font-size: 13px;
-      display: none;
-    }
-
-    .payment-number strong {
-      display: block;
-      font-size: 17px;
-      margin-top: 5px;
-      letter-spacing: 1px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 7px;
-      color: #4a5562;
-    }
-
-    .form-input {
-      width: 100%;
-      height: 48px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      padding: 0 13px;
-      outline: none;
-      font-size: 14px;
-    }
-
-    .form-input:focus {
-      border-color: var(--primary);
-    }
-
-    .submit-payment {
-      width: 100%;
-      height: 51px;
-      border-radius: 13px;
-      background: var(--primary);
-      color: white;
-      font-weight: 800;
-      font-size: 14px;
-      margin-top: 10px;
-    }
-
-    /* Orders */
-
-    .order-item {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 14px;
-      margin-bottom: 10px;
-    }
-
-    .order-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .order-title {
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .order-id {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 5px;
-    }
-
-    .status {
-      padding: 5px 8px;
-      border-radius: 7px;
-      font-size: 9px;
-      height: fit-content;
-    }
-
-    .status.pending {
-      background: #fff7e6;
-      color: #d97706;
-    }
-
-    .status.success {
-      background: #eaf8ef;
-      color: var(--success);
-    }
-
-    .order-bottom {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    /* Profile */
-
-    .profile-card {
-      background: linear-gradient(135deg, #229ed9, #147db2);
-      color: white;
-      border-radius: 20px;
-      padding: 25px;
-      text-align: center;
-    }
-
-    .profile-avatar {
-      width: 75px;
-      height: 75px;
-      border-radius: 50%;
-      background: white;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: auto;
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    .profile-card h2 {
-      margin-top: 12px;
-      font-size: 19px;
-    }
-
-    .profile-card p {
-      margin-top: 4px;
-      font-size: 12px;
-      opacity: .8;
-    }
-
-    .profile-menu {
-      background: white;
-      border-radius: 16px;
-      margin-top: 13px;
-      overflow: hidden;
-    }
-
-    .profile-menu button {
-      width: 100%;
-      padding: 16px;
-      background: white;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      font-size: 13px;
-    }
-
-    /* Modal */
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      display: none;
-      align-items: flex-end;
-      z-index: 500;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      background: white;
-      border-radius: 23px 23px 0 0;
-      padding: 20px 16px 25px;
-      animation: slideUp .25s ease;
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
-    }
-
-    .modal-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .modal-head h2 {
-      font-size: 18px;
-    }
-
-    .close-modal {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #f1f4f6;
-    }
-
-    /* Toast */
-
-    .toast {
-      position: fixed;
-      left: 15px;
-      right: 15px;
-      bottom: 82px;
-      background: #17212b;
-      color: white;
-      padding: 13px 15px;
-      border-radius: 12px;
-      font-size: 12px;
-      text-align: center;
-      transform: translateY(120px);
-      opacity: 0;
-      transition: .3s;
-      z-index: 1000;
-    }
-
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    @media (min-width: 600px) {
-      .course-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .header {
-        border-radius: 0 0 30px 30px;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>CourseLink BD</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f4f7fb;
+    color:#17212b;
+    padding-bottom:75px;
+}
+
+button,input,textarea{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+    border:0;
+}
+
+.header{
+    background:linear-gradient(135deg,#229ed9,#087bb5);
+    color:white;
+    padding:18px 15px 25px;
+    border-radius:0 0 25px 25px;
+}
+
+.header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.logo{
+    width:43px;
+    height:43px;
+    border-radius:13px;
+    background:rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.brand-title{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.brand-sub{
+    font-size:10px;
+    opacity:.8;
+    margin-top:3px;
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:white;
+    color:#1689bd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.welcome{
+    margin-top:20px;
+    font-size:23px;
+}
+
+.subtitle{
+    margin-top:5px;
+    font-size:12px;
+    opacity:.85;
+}
+
+.search{
+    width:100%;
+    height:47px;
+    margin-top:16px;
+    border:0;
+    outline:0;
+    border-radius:13px;
+    padding:0 15px;
+    font-size:13px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    padding:16px 14px;
+}
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:5px 0 13px;
+}
+
+.section-title h2{
+    font-size:17px;
+}
+
+.section-title span{
+    color:#229ed9;
+    font-size:11px;
+}
+
+.categories{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    margin-bottom:18px;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    white-space:nowrap;
+    padding:9px 15px;
+    border-radius:30px;
+    background:white;
+    border:1px solid #e5ebf0;
+    font-size:11px;
+    color:#64748b;
+}
+
+.category.active{
+    background:#229ed9;
+    color:white;
+}
+
+.course-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:11px;
+}
+
+.course-card{
+    background:white;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid #e6edf2;
+}
+
+.course-image{
+    width:100%;
+    height:120px;
+    object-fit:cover;
+}
+
+.course-body{
+    padding:10px;
+}
+
+.course-title{
+    font-size:13px;
+    font-weight:bold;
+    line-height:1.4;
+    min-height:37px;
+}
+
+.course-category{
+    font-size:10px;
+    color:#718096;
+    margin:6px 0;
+}
+
+.course-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.price{
+    color:#1689bd;
+    font-weight:bold;
+}
+
+.buy-btn{
+    background:#229ed9;
+    color:white;
+    border-radius:8px;
+    padding:8px 11px;
+    font-size:10px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.page-header{
+    background:white;
+    height:58px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:0 14px;
+    border-bottom:1px solid #e7edf2;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.page-header h2{
+    font-size:17px;
+}
+
+.back-btn{
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    background:#eef3f6;
+    font-size:18px;
+}
+
+.hero{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.details{
+    padding:17px 14px;
+}
+
+.details h1{
+    font-size:22px;
+    margin-bottom:10px;
+}
+
+.pill{
+    display:inline-block;
+    background:#eaf7fc;
+    color:#1689bd;
+    padding:7px 9px;
+    border-radius:8px;
+    font-size:10px;
+    margin-right:5px;
+}
+
+.description{
+    margin-top:15px;
+    font-size:13px;
+    line-height:1.7;
+    color:#64748b;
+}
+
+.features{
+    background:white;
+    padding:15px;
+    border-radius:14px;
+    margin-top:15px;
+}
+
+.feature{
+    font-size:12px;
+    padding:8px 0;
+    border-bottom:1px solid #f0f2f4;
+}
+
+.feature:last-child{
+    border-bottom:0;
+}
+
+.main-btn{
+    width:100%;
+    height:50px;
+    background:#229ed9;
+    color:white;
+    border-radius:12px;
+    font-weight:bold;
+    margin-top:16px;
+}
+
+.payment-box{
+    background:white;
+    border:1px solid #e5ebf0;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:12px;
+}
+
+.payment-methods{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+}
+
+.payment-method{
+    padding:14px;
+    background:white;
+    border:2px solid #e5ebf0;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+.payment-method.selected{
+    border-color:#229ed9;
+    background:#eaf7fc;
+    color:#1689bd;
+}
+
+.payment-number{
+    margin-top:12px;
+    padding:13px;
+    background:#f4f7f9;
+    border-radius:10px;
+    font-size:12px;
+    display:none;
+}
+
+.copy-btn{
+    float:right;
+    background:#229ed9;
+    color:white;
+    padding:5px 8px;
+    border-radius:6px;
+    font-size:9px;
+}
+
+label{
+    display:block;
+    font-size:11px;
+    font-weight:bold;
+    margin:12px 0 6px;
+}
+
+.input,
+.textarea{
+    width:100%;
+    border:1px solid #dfe6ec;
+    border-radius:10px;
+    padding:12px;
+    outline:none;
+    background:white;
+}
+
+.textarea{
+    min-height:80px;
+    resize:none;
+}
+
+.notice{
+    margin-top:10px;
+    padding:11px;
+    background:#f5f8fa;
+    border-radius:10px;
+    font-size:10px;
+    line-height:1.6;
+    color:#64748b;
+}
+
+.order{
+    background:white;
+    border:1px solid #e5ebf0;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:11px;
+}
+
+.order-title{
+    font-size:13px;
+    font-weight:bold;
+}
+
+.order-info{
+    font-size:10px;
+    color:#718096;
+    margin-top:7px;
+    line-height:1.7;
+}
+
+.status{
+    float:right;
+    font-size:9px;
+    padding:5px 8px;
+    border-radius:7px;
+    background:#fff4d9;
+    color:#b77900;
+}
+
+.status.approved{
+    background:#e9f8ee;
+    color:#16813c;
+}
+
+.status.rejected{
+    background:#feecec;
+    color:#c53030;
+}
+
+.course-link{
+    display:block;
+    margin-top:10px;
+    padding:11px;
+    border-radius:9px;
+    background:#eaf7fc;
+    color:#1689bd;
+    text-decoration:none;
+    font-size:11px;
+    word-break:break-all;
+}
+
+.empty{
+    text-align:center;
+    color:#718096;
+    padding:55px 10px;
+    font-size:12px;
+}
+
+.bottom-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    height:68px;
+    background:white;
+    border-top:1px solid #e5ebf0;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    z-index:100;
+}
+
+.nav-btn{
+    background:none;
+    color:#8793a0;
+    font-size:10px;
+}
+
+.nav-btn.active{
+    color:#229ed9;
+    font-weight:bold;
+}
+
+.nav-icon{
+    display:block;
+    font-size:20px;
+    margin-bottom:3px;
+}
+
+/* ADMIN */
+
+.admin-login{
+    max-width:400px;
+    margin:60px auto;
+}
+
+.admin-panel{
+    display:none;
+}
+
+.admin-top{
+    background:#17212b;
+    color:white;
+    padding:18px;
+}
+
+.admin-container{
+    max-width:1100px;
+    margin:auto;
+    padding:18px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+}
+
+.stat{
+    background:white;
+    padding:17px;
+    border-radius:14px;
+    border:1px solid #e5ebf0;
+}
+
+.stat b{
+    display:block;
+    font-size:24px;
+}
+
+.stat span{
+    color:#718096;
+    font-size:10px;
+    margin-top:5px;
+    display:block;
+}
+
+.admin-toolbar{
+    display:flex;
+    gap:10px;
+    margin:18px 0;
+}
+
+.admin-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+.admin-table th,
+.admin-table td{
+    padding:11px;
+    border-bottom:1px solid #edf1f4;
+    font-size:10px;
+    text-align:left;
+}
+
+.admin-card{
+    background:white;
+    border-radius:14px;
+    padding:15px;
+    border:1px solid #e5ebf0;
+}
+
+.admin-btn{
+    padding:8px 10px;
+    border-radius:7px;
+    color:white;
+    font-size:9px;
+}
+
+.green{
+    background:#16a34a;
+}
+
+.red{
+    background:#ef4444;
+}
+
+.gray{
+    background:#64748b;
+}
+
+@media(max-width:700px){
+
+    .course-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .admin-table{
+        min-width:900px;
+    }
+
+    .admin-card{
+        overflow-x:auto;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<!-- ================= HOME PAGE ================= -->
+<!-- ================= USER HOME ================= -->
 
 <div id="homePage" class="page active">
 
-  <header class="header">
+<header class="header">
 
-    <div class="topbar">
+<div class="header-top">
 
-      <div class="brand">
-        <div class="brand-icon">🎓</div>
+<div class="brand">
 
-        <div>
-          <h2>CourseLink BD</h2>
-          <small>Premium Course Community</small>
-        </div>
-      </div>
+<div class="logo">🎓</div>
 
-      <div class="user-avatar" id="headerAvatar">
-        U
-      </div>
+<div>
+<div class="brand-title">CourseLink BD</div>
+<div class="brand-sub">Telegram Course Access</div>
+</div>
 
-    </div>
+</div>
 
-    <div class="welcome">
-      <h1 id="welcomeText">স্বাগতম 👋</h1>
-      <p>আপনার পছন্দের কোর্সের Telegram Group Access কিনুন</p>
-    </div>
+<div class="avatar" id="userAvatar">U</div>
 
-    <div class="search-box">
+</div>
 
-      <span class="search-icon">🔍</span>
+<div class="welcome" id="welcome">
+স্বাগতম 👋
+</div>
 
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="কোর্স খুঁজুন..."
-        autocomplete="off"
-      >
+<div class="subtitle">
+পছন্দের কোর্স কিনে Telegram Group Access নিন
+</div>
 
-      <button
-        class="clear-search"
-        id="clearSearch"
-        onclick="clearSearch()"
-      >
-        ×
-      </button>
+<input
+class="search"
+id="searchInput"
+placeholder="🔎 কোর্স খুঁজুন..."
+>
 
-    </div>
+</header>
 
-  </header>
+<main class="container">
 
+<div class="section-title">
 
-  <main class="container">
+<h2>📚 Courses</h2>
 
-    <div class="section-header">
-      <h2>ক্যাটাগরি</h2>
-    </div>
+<span id="courseCount">
+0 Courses
+</span>
 
-    <div class="categories">
+</div>
 
-      <button class="category active" onclick="filterCategory('all', this)">
-        সব
-      </button>
+<div class="categories" id="categories"></div>
 
-      <button class="category" onclick="filterCategory('marketing', this)">
-        Marketing
-      </button>
+<div class="course-grid" id="courseGrid"></div>
 
-      <button class="category" onclick="filterCategory('freelancing', this)">
-        Freelancing
-      </button>
-
-      <button class="category" onclick="filterCategory('design', this)">
-        Design
-      </button>
-
-      <button class="category" onclick="filterCategory('programming', this)">
-        Programming
-      </button>
-
-      <button class="category" onclick="filterCategory('business', this)">
-        Business
-      </button>
-
-    </div>
-
-
-    <div class="section-header" style="margin-top:22px;">
-      <h2>জনপ্রিয় কোর্স</h2>
-      <span id="courseCount">0 Courses</span>
-    </div>
-
-
-    <div id="courseGrid" class="course-grid"></div>
-
-    <div id="emptyState" class="empty">
-
-      <div class="empty-icon">🔍</div>
-
-      <h3>কোনো কোর্স পাওয়া যায়নি</h3>
-
-      <p style="margin-top:5px;font-size:12px;">
-        অন্য কোনো নাম দিয়ে খুঁজে দেখুন
-      </p>
-
-    </div>
-
-  </main>
+</main>
 
 </div>
 
 
-<!-- ================= DETAILS PAGE ================= -->
+<!-- ================= DETAILS ================= -->
 
 <div id="detailsPage" class="page">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <button class="back-btn" onclick="goHome()">
-      ←
-    </button>
+<button class="back-btn" onclick="showPage('homePage')">
+←
+</button>
 
-    <h2>Course Details</h2>
+<h2>Course Details</h2>
 
-  </div>
+</div>
 
-  <div id="detailsContent"></div>
+<div id="detailsContent"></div>
 
 </div>
 
 
-<!-- ================= PAYMENT PAGE ================= -->
+<!-- ================= PAYMENT ================= -->
 
 <div id="paymentPage" class="page">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <button class="back-btn" onclick="showPage('detailsPage')">
-      ←
-    </button>
+<button class="back-btn" onclick="showPage('detailsPage')">
+←
+</button>
 
-    <h2>Payment</h2>
+<h2>💳 Payment</h2>
 
-  </div>
+</div>
 
-  <main class="container">
+<main class="container">
 
-    <div id="paymentContent"></div>
+<div id="paymentContent"></div>
 
-  </main>
+</main>
 
 </div>
 
 
-<!-- ================= ORDERS PAGE ================= -->
+<!-- ================= ORDERS ================= -->
 
 <div id="ordersPage" class="page">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <h2>🛍️ My Orders</h2>
+<h2>🛍️ My Orders</h2>
 
-  </div>
+</div>
 
-  <main class="container">
+<main class="container">
 
-    <div id="ordersList"></div>
+<div id="ordersContent"></div>
 
-  </main>
+</main>
 
 </div>
 
 
-<!-- ================= PROFILE PAGE ================= -->
+<!-- ================= PROFILE ================= -->
 
 <div id="profilePage" class="page">
 
-  <div class="page-header">
+<div class="page-header">
 
-    <h2>👤 Profile</h2>
+<h2>👤 Profile</h2>
 
-  </div>
+</div>
 
-  <main class="container">
+<main class="container">
 
-    <div class="profile-card">
+<div class="payment-box" style="text-align:center">
 
-      <div class="profile-avatar" id="profileAvatar">
-        U
-      </div>
+<div
+class="avatar"
+id="profileAvatar"
+style="margin:auto"
+>
+U
+</div>
 
-      <h2 id="profileName">
-        Telegram User
-      </h2>
+<h3 id="profileName" style="margin-top:12px">
+Telegram User
+</h3>
 
-      <p id="profileUsername">
-        @username
-      </p>
+<p
+id="profileUsername"
+style="font-size:11px;color:#718096;margin-top:5px"
+>
+</p>
 
-    </div>
+</div>
+
+</main>
+
+</div>
 
 
-    <div class="profile-menu">
+<!-- ================= ADMIN ================= -->
 
-      <button onclick="showToast('এই অপশনটি পরে Backend-এর সাথে যুক্ত করা হবে')">
-        📚 My Courses
-      </button>
+<div id="adminPage" class="page">
 
-      <button onclick="showToast('Support: আপনার Telegram Support Username এখানে দিন')">
-        💬 Customer Support
-      </button>
+<div class="admin-top">
 
-      <button onclick="showToast('Terms & Conditions এখানে যোগ করুন')">
-        📄 Terms & Conditions
-      </button>
+<b>⚙️ CourseLink BD — Admin</b>
 
-      <button onclick="showToast('Privacy Policy এখানে যোগ করুন')">
-        🔒 Privacy Policy
-      </button>
+</div>
 
-    </div>
+<div class="admin-container">
 
-  </main>
+<div id="adminLogin" class="admin-card admin-login">
+
+<h2>Admin Login</h2>
+
+<br>
+
+<label>Email</label>
+
+<input
+id="adminEmail"
+class="input"
+placeholder="Admin Email"
+>
+
+<label>Password</label>
+
+<input
+id="adminPassword"
+class="input"
+type="password"
+placeholder="Password"
+>
+
+<button
+class="main-btn"
+onclick="adminLogin()"
+>
+Login
+</button>
+
+<p
+id="adminError"
+style="color:red;font-size:11px;margin-top:10px"
+></p>
+
+</div>
+
+
+<div id="adminPanel" class="admin-panel">
+
+<div class="stats">
+
+<div class="stat">
+<b id="totalUsers">0</b>
+<span>Users</span>
+</div>
+
+<div class="stat">
+<b id="totalCourses">0</b>
+<span>Courses</span>
+</div>
+
+<div class="stat">
+<b id="pendingOrders">0</b>
+<span>Pending Orders</span>
+</div>
+
+<div class="stat">
+<b id="totalRevenue">৳0</b>
+<span>Revenue</span>
+</div>
+
+</div>
+
+<br>
+
+<div class="admin-toolbar">
+
+<input
+id="adminSearch"
+class="input"
+placeholder="Search Order..."
+oninput="renderAdminOrders()"
+>
+
+<select
+id="adminStatus"
+class="input"
+onchange="renderAdminOrders()"
+>
+
+<option value="all">All</option>
+<option value="pending">Pending</option>
+<option value="approved">Approved</option>
+<option value="rejected">Rejected</option>
+
+</select>
+
+</div>
+
+
+<div class="admin-card">
+
+<h3>Payment Orders</h3>
+
+<br>
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Order</th>
+<th>User</th>
+<th>Course</th>
+<th>Payment</th>
+<th>Screenshot</th>
+<th>Status</th>
+<th>Course Link</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="adminOrdersTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -1000,1179 +891,1464 @@
 
 <nav class="bottom-nav">
 
-  <button
-    class="nav-item active"
-    onclick="navigate('home')"
-    id="navHome"
-  >
-    <span class="nav-icon">🏠</span>
-    Home
-  </button>
+<button
+class="nav-btn active"
+id="navHome"
+onclick="showPage('homePage')"
+>
 
-  <button
-    class="nav-item"
-    onclick="navigate('orders')"
-    id="navOrders"
-  >
-    <span class="nav-icon">🛍️</span>
-    Orders
-  </button>
+<span class="nav-icon">🏠</span>
+Home
 
-  <button
-    class="nav-item"
-    onclick="navigate('profile')"
-    id="navProfile"
-  >
-    <span class="nav-icon">👤</span>
-    Profile
-  </button>
+</button>
+
+<button
+class="nav-btn"
+id="navOrders"
+onclick="showPage('ordersPage');renderOrders()"
+>
+
+<span class="nav-icon">🛍️</span>
+Orders
+
+</button>
+
+<button
+class="nav-btn"
+id="navProfile"
+onclick="showPage('profilePage')"
+>
+
+<span class="nav-icon">👤</span>
+Profile
+
+</button>
 
 </nav>
 
 
-<!-- ================= MODAL ================= -->
-
-<div class="modal" id="successModal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <h2>✅ Order Submitted</h2>
-
-      <button
-        class="close-modal"
-        onclick="closeSuccessModal()"
-      >
-        ×
-      </button>
-
-    </div>
-
-    <div style="text-align:center;padding:10px 0 20px;">
-
-      <div style="font-size:55px;">
-        🎉
-      </div>
-
-      <h3 style="margin-top:8px;">
-        Payment Submitted
-      </h3>
-
-      <p
-        style="
-        color:#718096;
-        font-size:12px;
-        line-height:1.6;
-        margin-top:8px;
-        "
-      >
-        আপনার অর্ডারটি সফলভাবে জমা হয়েছে।
-        Admin payment verify করার পর আপনার
-        Telegram Group/Channel access দেওয়া হবে।
-      </p>
-
-    </div>
-
-    <button
-      class="submit-payment"
-      onclick="closeSuccessModal(); navigate('orders')"
-    >
-      My Orders দেখুন
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- ================= TOAST ================= -->
-
-<div class="toast" id="toast"></div>
-
-
 <script>
 
-/* =========================================================
-   TELEGRAM WEB APP
-========================================================= */
+/* =====================================================
+   TELEGRAM MINI APP
+===================================================== */
 
 const tg = window.Telegram?.WebApp;
 
-if (tg) {
+if(tg){
 
-  tg.ready();
+    tg.ready();
 
-  tg.expand();
+    tg.expand();
 
-  try {
-    tg.setHeaderColor("#229ed9");
-    tg.setBackgroundColor("#f4f7fa");
-  } catch (e) {}
+    try{
+
+        tg.setHeaderColor("#229ed9");
+        tg.setBackgroundColor("#f4f7fb");
+
+    }catch(e){}
 
 }
 
 
-/* =========================================================
-   DEMO COURSE DATA
+/* =====================================================
+   CONFIGURATION
+===================================================== */
 
-   পরে এগুলো Firebase/API থেকে আসবে
-========================================================= */
+const CONFIG = {
 
-const courses = [
+    /* তোমার bKash নম্বর */
+    bkashNumber:"01XXXXXXXXX",
 
-  {
-    id: 1,
+    /* তোমার Nagad নম্বর */
+    nagadNumber:"01XXXXXXXXX",
 
-    title: "Facebook Marketing Masterclass",
+    /* Admin password demo */
+    adminPassword:"123456",
 
-    category: "marketing",
-
-    price: 499,
-
-    oldPrice: 999,
-
-    students: 1250,
-
-    lessons: 42,
-
-    duration: "18 Hours",
-
-    image:
-      "https://images.unsplash.com/photo-1557838923-2985c318be48?auto=format&fit=crop&w=900&q=80",
-
-    description:
-      "Facebook Marketing শিখে নিজের Business বা Freelancing Career শুরু করার জন্য সম্পূর্ণ একটি কোর্স।",
-
-    features: [
-      "Facebook Ads Complete Guide",
-      "Audience Targeting",
-      "Campaign Setup",
-      "Ads Optimization",
-      "Real Project Practice",
-      "Private Telegram Community"
-    ]
-
-  },
+};
 
 
-  {
-    id: 2,
+/* =====================================================
+   USER
+===================================================== */
 
-    title: "Professional Freelancing Course",
-
-    category: "freelancing",
-
-    price: 699,
-
-    oldPrice: 1299,
-
-    students: 890,
-
-    lessons: 55,
-
-    duration: "25 Hours",
-
-    image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
-
-    description:
-      "Freelancing Marketplace সম্পর্কে Beginner থেকে Advanced পর্যন্ত শেখার জন্য সম্পূর্ণ কোর্স।",
-
-    features: [
-      "Freelancing Basics",
-      "Marketplace Setup",
-      "Client Finding",
-      "Proposal Writing",
-      "Communication Skills",
-      "Private Telegram Group"
-    ]
-
-  },
+let telegramUser =
+tg?.initDataUnsafe?.user ||
+{
+    id:"demo-user",
+    first_name:"Demo",
+    username:"demo_user"
+};
 
 
-  {
-    id: 3,
+function setupUser(){
 
-    title: "Graphic Design with Canva",
+    const name =
+    telegramUser.first_name ||
+    "User";
 
-    category: "design",
+    document.getElementById(
+        "welcome"
+    ).textContent =
+    "স্বাগতম, "+name+" 👋";
 
-    price: 399,
 
-    oldPrice: 799,
+    document.getElementById(
+        "userAvatar"
+    ).textContent =
+    name.charAt(0).toUpperCase();
 
-    students: 740,
 
-    lessons: 35,
+    document.getElementById(
+        "profileAvatar"
+    ).textContent =
+    name.charAt(0).toUpperCase();
 
-    duration: "12 Hours",
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
+    name;
+
+
+    document.getElementById(
+        "profileUsername"
+    ).textContent =
+    telegramUser.username
+    ?
+    "@"+telegramUser.username
+    :
+    "";
+
+}
+
+
+/* =====================================================
+   COURSE DATABASE
+===================================================== */
+
+let courses = [
+
+{
+    id:"course001",
+
+    title:"Facebook Marketing Masterclass",
+
+    category:"Marketing",
+
+    price:499,
 
     image:
-      "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1557838923-2985c318be48?auto=format&fit=crop&w=900&q=80",
 
     description:
-      "Canva ব্যবহার করে Professional Social Media Design এবং Graphic Design শেখার কোর্স।",
+    "Facebook Marketing শেখার জন্য সম্পূর্ণ beginner থেকে advanced course।",
 
-    features: [
-      "Canva Basics",
-      "Social Media Design",
-      "Logo Design",
-      "Banner Design",
-      "Thumbnail Design",
-      "Private Community"
+    features:[
+        "Facebook Page Setup",
+        "Facebook Ads",
+        "Audience Targeting",
+        "Campaign Setup",
+        "Private Telegram Group"
     ]
 
-  },
+},
 
+{
 
-  {
-    id: 4,
+    id:"course002",
 
-    title: "Web Development Bootcamp",
+    title:"Web Development Bootcamp",
 
-    category: "programming",
+    category:"Programming",
 
-    price: 899,
-
-    oldPrice: 1599,
-
-    students: 620,
-
-    lessons: 80,
-
-    duration: "40 Hours",
+    price:899,
 
     image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
 
     description:
-      "HTML, CSS, JavaScript এবং আধুনিক Web Development শেখার জন্য Complete Bootcamp।",
+    "HTML, CSS এবং JavaScript দিয়ে modern website তৈরি শেখার সম্পূর্ণ কোর্স।",
 
-    features: [
-      "HTML5",
-      "CSS3",
-      "JavaScript",
-      "Responsive Design",
-      "Real Projects",
-      "Developer Community"
+    features:[
+        "HTML5",
+        "CSS3",
+        "JavaScript",
+        "Responsive Design",
+        "Real Projects"
     ]
 
-  },
+},
 
+{
 
-  {
-    id: 5,
+    id:"course003",
 
-    title: "Digital Business Blueprint",
+    title:"Graphic Design Course",
 
-    category: "business",
+    category:"Design",
 
-    price: 599,
-
-    oldPrice: 1199,
-
-    students: 510,
-
-    lessons: 30,
-
-    duration: "14 Hours",
+    price:699,
 
     image:
-      "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=900&q=80",
 
     description:
-      "Online Business শুরু এবং Grow করার জন্য Practical Digital Business Course।",
+    "Professional graphic design শেখার জন্য practical course।",
 
-    features: [
-      "Business Idea",
-      "Brand Building",
-      "Digital Marketing",
-      "Customer Acquisition",
-      "Sales Strategy",
-      "Private Telegram Group"
+    features:[
+        "Design Basics",
+        "Photoshop",
+        "Illustrator",
+        "Logo Design",
+        "Social Media Design"
     ]
 
-  },
+},
 
+{
 
-  {
-    id: 6,
+    id:"course004",
 
-    title: "Advanced JavaScript Course",
+    title:"Digital Marketing Course",
 
-    category: "programming",
+    category:"Marketing",
 
-    price: 799,
-
-    oldPrice: 1499,
-
-    students: 410,
-
-    lessons: 65,
-
-    duration: "30 Hours",
+    price:799,
 
     image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=900&q=80",
+    "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=900&q=80",
 
     description:
-      "JavaScript Beginner থেকে Advanced Level পর্যন্ত শেখার জন্য একটি সম্পূর্ণ কোর্স।",
+    "Digital Marketing-এর গুরুত্বপূর্ণ বিষয়গুলো একসাথে শেখানো হবে।",
 
-    features: [
-      "JavaScript Fundamentals",
-      "ES6+",
-      "DOM",
-      "Async JavaScript",
-      "API Integration",
-      "Private Telegram Group"
+    features:[
+        "SEO",
+        "Facebook Marketing",
+        "Content Marketing",
+        "Analytics",
+        "Marketing Strategy"
     ]
 
-  }
+}
 
 ];
 
 
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentCategory = "all";
-
 let selectedCourse = null;
-
-let selectedPaymentMethod = null;
-
-let orders =
-  JSON.parse(localStorage.getItem("courseOrders") || "[]");
+let selectedPayment = null;
 
 
-/* =========================================================
-   TELEGRAM USER
-========================================================= */
+/* =====================================================
+   COURSE RENDER
+===================================================== */
 
-function loadTelegramUser() {
+function renderCourses(list=courses){
 
-  let user = tg?.initDataUnsafe?.user;
-
-  if (user) {
-
-    const name =
-      user.first_name ||
-      "Telegram User";
-
-    const username =
-      user.username
-        ? "@" + user.username
-        : "Telegram User";
-
-    const avatarLetter =
-      name.charAt(0).toUpperCase();
-
-    document.getElementById("welcomeText").textContent =
-      "স্বাগতম, " + name + " 👋";
-
-    document.getElementById("profileName").textContent =
-      name;
-
-    document.getElementById("profileUsername").textContent =
-      username;
-
-    document.getElementById("headerAvatar").textContent =
-      avatarLetter;
-
-    document.getElementById("profileAvatar").textContent =
-      avatarLetter;
-
-  }
-
-}
-
-
-/* =========================================================
-   RENDER COURSES
-========================================================= */
-
-function renderCourses(list = courses) {
-
-  const grid =
-    document.getElementById("courseGrid");
-
-  const empty =
-    document.getElementById("emptyState");
-
-  const count =
-    document.getElementById("courseCount");
-
-  grid.innerHTML = "";
-
-  count.textContent =
-    list.length + " Courses";
-
-  if (!list.length) {
-
-    empty.style.display = "block";
-
-    return;
-
-  }
-
-  empty.style.display = "none";
-
-  list.forEach(course => {
-
-    const card =
-      document.createElement("div");
-
-    card.className =
-      "course-card";
-
-    card.onclick =
-      () => openCourse(course.id);
-
-    card.innerHTML = `
-
-      <div class="course-image">
-
-        <img
-          src="${course.image}"
-          alt="${escapeHTML(course.title)}"
-          loading="lazy"
-        >
-
-        <span class="course-badge">
-          ${course.category.toUpperCase()}
-        </span>
-
-      </div>
-
-      <div class="course-content">
-
-        <div class="course-title">
-          ${escapeHTML(course.title)}
-        </div>
-
-        <div class="course-meta">
-
-          <span>👥 ${course.students}</span>
-
-          <span>📚 ${course.lessons}</span>
-
-        </div>
-
-        <div class="course-bottom">
-
-          <div>
-
-            <span class="price">
-              ৳${course.price}
-            </span>
-
-            <span class="old-price">
-              ৳${course.oldPrice}
-            </span>
-
-          </div>
-
-          <button
-            class="buy-btn"
-            onclick="event.stopPropagation(); openCourse(${course.id})"
-          >
-            Buy
-          </button>
-
-        </div>
-
-      </div>
-
-    `;
-
-    grid.appendChild(card);
-
-  });
-
-}
-
-
-/* =========================================================
-   CATEGORY
-========================================================= */
-
-function filterCategory(category, element) {
-
-  currentCategory = category;
-
-  document
-    .querySelectorAll(".category")
-    .forEach(btn =>
-      btn.classList.remove("active")
+    const grid =
+    document.getElementById(
+        "courseGrid"
     );
 
-  element.classList.add("active");
+    document.getElementById(
+        "courseCount"
+    ).textContent =
+    list.length+" Courses";
 
-  applyFilters();
 
-}
+    if(!list.length){
 
+        grid.innerHTML=
+        `<div class="empty"
+        style="grid-column:1/-1">
+        🔎<br><br>
+        কোনো কোর্স পাওয়া যায়নি
+        </div>`;
 
-/* =========================================================
-   SEARCH
-========================================================= */
-
-document
-  .getElementById("searchInput")
-  .addEventListener("input", function () {
-
-    document.getElementById("clearSearch").style.display =
-      this.value ? "block" : "none";
-
-    applyFilters();
-
-  });
-
-
-function applyFilters() {
-
-  const search =
-    document
-      .getElementById("searchInput")
-      .value
-      .toLowerCase()
-      .trim();
-
-  let filtered = courses.filter(course => {
-
-    const matchesCategory =
-      currentCategory === "all" ||
-      course.category === currentCategory;
-
-    const matchesSearch =
-      !search ||
-      course.title
-        .toLowerCase()
-        .includes(search);
-
-    return matchesCategory && matchesSearch;
-
-  });
-
-  renderCourses(filtered);
-
-}
-
-
-function clearSearch() {
-
-  document.getElementById("searchInput").value = "";
-
-  document.getElementById("clearSearch").style.display =
-    "none";
-
-  applyFilters();
-
-}
-
-
-/* =========================================================
-   COURSE DETAILS
-========================================================= */
-
-function openCourse(id) {
-
-  selectedCourse =
-    courses.find(course => course.id === id);
-
-  if (!selectedCourse) return;
-
-  const c = selectedCourse;
-
-  document.getElementById("detailsContent").innerHTML = `
-
-    <img
-      class="details-image"
-      src="${c.image}"
-      alt="${escapeHTML(c.title)}"
-    >
-
-    <div class="details-content">
-
-      <h1 class="details-title">
-        ${escapeHTML(c.title)}
-      </h1>
-
-      <div class="details-info">
-
-        <span class="info-pill">
-          👥 ${c.students} Students
-        </span>
-
-        <span class="info-pill">
-          📚 ${c.lessons} Lessons
-        </span>
-
-        <span class="info-pill">
-          ⏱️ ${c.duration}
-        </span>
-
-      </div>
-
-      <p class="description">
-        ${escapeHTML(c.description)}
-      </p>
-
-      <div class="features">
-
-        <h3>
-          এই কোর্সে যা থাকছে
-        </h3>
-
-        ${c.features.map(feature => `
-
-          <div class="feature">
-
-            <span class="check">
-              ✓
-            </span>
-
-            <span>
-              ${escapeHTML(feature)}
-            </span>
-
-          </div>
-
-        `).join("")}
-
-      </div>
-
-      <button
-        class="details-buy"
-        onclick="openPayment()"
-      >
-        🛒 ৳${c.price} — Buy Now
-      </button>
-
-    </div>
-
-  `;
-
-  showPage("detailsPage");
-
-}
-
-
-/* =========================================================
-   PAYMENT PAGE
-========================================================= */
-
-function openPayment() {
-
-  if (!selectedCourse) return;
-
-  selectedPaymentMethod = null;
-
-  const c = selectedCourse;
-
-  document.getElementById("paymentContent").innerHTML = `
-
-    <div class="payment-card">
-
-      <div class="order-course">
-
-        <img
-          src="${c.image}"
-          alt=""
-        >
-
-        <div>
-
-          <h3>
-            ${escapeHTML(c.title)}
-          </h3>
-
-          <p>
-            Payable: ৳${c.price}
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <div class="payment-card">
-
-      <label class="form-label">
-        Payment Method
-      </label>
-
-      <div class="payment-methods">
-
-        <button
-          class="payment-method"
-          id="bkashMethod"
-          onclick="selectPayment('bkash')"
-        >
-          🩷 bKash
-        </button>
-
-        <button
-          class="payment-method"
-          id="nagadMethod"
-          onclick="selectPayment('nagad')"
-        >
-          🟠 Nagad
-        </button>
-
-      </div>
-
-      <div
-        class="payment-number"
-        id="paymentNumber"
-      ></div>
-
-    </div>
-
-
-    <div class="payment-card">
-
-      <label class="form-label">
-        আপনার পেমেন্টের Transaction ID
-      </label>
-
-      <input
-        class="form-input"
-        id="transactionId"
-        type="text"
-        placeholder="যেমন: 8F3D7A9K2L"
-        autocomplete="off"
-      >
-
-      <button
-        class="submit-payment"
-        onclick="submitPayment()"
-      >
-        ✅ Payment Submit করুন
-      </button>
-
-    </div>
-
-    <div
-      style="
-      text-align:center;
-      color:#718096;
-      font-size:10px;
-      line-height:1.6;
-      padding:5px 15px;
-      "
-    >
-      Payment করার পর সঠিক Transaction ID দিন।
-      Admin verification সম্পন্ন হলে আপনার
-      purchased Telegram Group/Channel access দেওয়া হবে।
-    </div>
-
-  `;
-
-  showPage("paymentPage");
-
-}
-
-
-/* =========================================================
-   PAYMENT METHOD
-========================================================= */
-
-function selectPayment(method) {
-
-  selectedPaymentMethod = method;
-
-  document
-    .querySelectorAll(".payment-method")
-    .forEach(btn =>
-      btn.classList.remove("selected")
-    );
-
-  if (method === "bkash") {
-
-    document
-      .getElementById("bkashMethod")
-      .classList.add("selected");
-
-    document.getElementById("paymentNumber").innerHTML = `
-      bKash Personal Number
-      <strong>01XXXXXXXXX</strong>
-    `;
-
-  }
-
-  if (method === "nagad") {
-
-    document
-      .getElementById("nagadMethod")
-      .classList.add("selected");
-
-    document.getElementById("paymentNumber").innerHTML = `
-      Nagad Personal Number
-      <strong>01XXXXXXXXX</strong>
-    `;
-
-  }
-
-  document
-    .getElementById("paymentNumber")
-    .style.display = "block";
-
-}
-
-
-/* =========================================================
-   SUBMIT PAYMENT
-========================================================= */
-
-function submitPayment() {
-
-  if (!selectedPaymentMethod) {
-
-    showToast("প্রথমে Payment Method নির্বাচন করুন");
-
-    return;
-
-  }
-
-  const transactionId =
-    document
-      .getElementById("transactionId")
-      .value
-      .trim();
-
-  if (!transactionId) {
-
-    showToast("Transaction ID দিন");
-
-    return;
-
-  }
-
-  if (transactionId.length < 5) {
-
-    showToast("সঠিক Transaction ID দিন");
-
-    return;
-
-  }
-
-  const telegramUser =
-    tg?.initDataUnsafe?.user;
-
-  const order = {
-
-    id:
-      "ORD-" +
-      Date.now(),
-
-    courseId:
-      selectedCourse.id,
-
-    courseName:
-      selectedCourse.title,
-
-    amount:
-      selectedCourse.price,
-
-    paymentMethod:
-      selectedPaymentMethod,
-
-    transactionId:
-      transactionId,
-
-    userId:
-      telegramUser?.id || "demo-user",
-
-    username:
-      telegramUser?.username || "",
-
-    status:
-      "pending",
-
-    createdAt:
-      new Date().toLocaleString("en-BD")
-
-  };
-
-  orders.unshift(order);
-
-  localStorage.setItem(
-    "courseOrders",
-    JSON.stringify(orders)
-  );
-
-  document
-    .getElementById("successModal")
-    .classList.add("show");
-
-}
-
-
-/* =========================================================
-   ORDERS
-========================================================= */
-
-function renderOrders() {
-
-  const list =
-    document.getElementById("ordersList");
-
-  if (!orders.length) {
-
-    list.innerHTML = `
-
-      <div class="empty" style="display:block;">
-
-        <div class="empty-icon">
-          🛍️
-        </div>
-
-        <h3>
-          কোনো Order নেই
-        </h3>
-
-        <p style="margin-top:5px;font-size:12px;">
-          আপনি এখনো কোনো কোর্স কিনেননি।
-        </p>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-  list.innerHTML = "";
-
-  orders.forEach(order => {
-
-    const div =
-      document.createElement("div");
-
-    div.className =
-      "order-item";
-
-    const statusClass =
-      order.status === "success"
-        ? "success"
-        : "pending";
-
-    const statusText =
-      order.status === "success"
-        ? "Completed"
-        : "Pending";
-
-    div.innerHTML = `
-
-      <div class="order-top">
-
-        <div>
-
-          <div class="order-title">
-            ${escapeHTML(order.courseName)}
-          </div>
-
-          <div class="order-id">
-            ${order.id}
-          </div>
-
-        </div>
-
-        <span class="status ${statusClass}">
-          ${statusText}
-        </span>
-
-      </div>
-
-      <div class="order-bottom">
-
-        <span>
-          ${order.paymentMethod.toUpperCase()}
-        </span>
-
-        <strong style="color:#229ed9;">
-          ৳${order.amount}
-        </strong>
-
-      </div>
-
-    `;
-
-    list.appendChild(div);
-
-  });
-
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-function navigate(page) {
-
-  if (page === "home") {
-
-    showPage("homePage");
-
-    setActiveNav("navHome");
-
-  }
-
-  else if (page === "orders") {
-
-    renderOrders();
-
-    showPage("ordersPage");
-
-    setActiveNav("navOrders");
-
-  }
-
-  else if (page === "profile") {
-
-    showPage("profilePage");
-
-    setActiveNav("navProfile");
-
-  }
-
-}
-
-
-function setActiveNav(id) {
-
-  document
-    .querySelectorAll(".nav-item")
-    .forEach(item =>
-      item.classList.remove("active")
-    );
-
-  document
-    .getElementById(id)
-    .classList.add("active");
-
-}
-
-
-function showPage(pageId) {
-
-  document
-    .querySelectorAll(".page")
-    .forEach(page =>
-      page.classList.remove("active")
-    );
-
-  document
-    .getElementById(pageId)
-    .classList.add("active");
-
-  window.scrollTo({
-    top: 0,
-    behavior: "instant"
-  });
-
-}
-
-
-function goHome() {
-
-  showPage("homePage");
-
-  setActiveNav("navHome");
-
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-function closeSuccessModal() {
-
-  document
-    .getElementById("successModal")
-    .classList.remove("show");
-
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-let toastTimer;
-
-function showToast(message) {
-
-  const toast =
-    document.getElementById("toast");
-
-  toast.textContent =
-    message;
-
-  toast.classList.add("show");
-
-  clearTimeout(toastTimer);
-
-  toastTimer =
-    setTimeout(() => {
-
-      toast.classList.remove("show");
-
-    }, 2500);
-
-}
-
-
-/* =========================================================
-   SECURITY HELPERS
-========================================================= */
-
-function escapeHTML(str) {
-
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-loadTelegramUser();
-
-renderCourses();
-
-renderOrders();
-
-
-/* =========================================================
-   CLOSE MODAL OUTSIDE
-========================================================= */
-
-document
-  .getElementById("successModal")
-  .addEventListener("click", function(e) {
-
-    if (e.target === this) {
-
-      closeSuccessModal();
+        return;
 
     }
 
-  });
+
+    grid.innerHTML =
+    list.map(course=>`
+
+        <div
+        class="course-card"
+        onclick="openCourse('${course.id}')"
+        >
+
+            <img
+            class="course-image"
+            src="${course.image}"
+            >
+
+            <div class="course-body">
+
+                <div class="course-title">
+                ${escapeHtml(course.title)}
+                </div>
+
+                <div class="course-category">
+                📚 ${escapeHtml(course.category)}
+                </div>
+
+                <div class="course-footer">
+
+                    <span class="price">
+                    ৳${course.price}
+                    </span>
+
+                    <button
+                    class="buy-btn"
+                    onclick="
+                    event.stopPropagation();
+                    openCourse('${course.id}')
+                    "
+                    >
+                    Buy
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+}
+
+
+/* =====================================================
+   CATEGORY
+===================================================== */
+
+function renderCategories(){
+
+    const categories =
+    [
+        "All",
+        ...new Set(
+            courses.map(
+                course=>course.category
+            )
+        )
+    ];
+
+
+    document.getElementById(
+        "categories"
+    ).innerHTML =
+    categories.map(
+        (cat,index)=>`
+
+        <button
+        class="category ${index===0?"active":""}"
+        onclick="filterCategory(this,'${cat}')"
+        >
+        ${cat}
+        </button>
+
+        `
+    ).join("");
+
+}
+
+
+function filterCategory(button,category){
+
+    document
+    .querySelectorAll(".category")
+    .forEach(
+        b=>b.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+
+    const result =
+    category==="All"
+    ?
+    courses
+    :
+    courses.filter(
+        c=>c.category===category
+    );
+
+
+    renderCourses(result);
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+document.getElementById(
+    "searchInput"
+).addEventListener(
+    "input",
+    function(){
+
+        const q =
+        this.value.toLowerCase();
+
+        renderCourses(
+            courses.filter(
+                c =>
+                c.title
+                .toLowerCase()
+                .includes(q)
+                ||
+                c.category
+                .toLowerCase()
+                .includes(q)
+            )
+        );
+
+    }
+);
+
+
+/* =====================================================
+   COURSE DETAILS
+===================================================== */
+
+function openCourse(id){
+
+    selectedCourse =
+    courses.find(
+        c=>c.id===id
+    );
+
+    if(!selectedCourse)
+    return;
+
+
+    document.getElementById(
+        "detailsContent"
+    ).innerHTML = `
+
+    <img
+    class="hero"
+    src="${selectedCourse.image}"
+    >
+
+    <div class="details">
+
+        <h1>
+        ${escapeHtml(selectedCourse.title)}
+        </h1>
+
+        <span class="pill">
+        📚 ${escapeHtml(selectedCourse.category)}
+        </span>
+
+        <span class="pill">
+        💰 ৳${selectedCourse.price}
+        </span>
+
+        <p class="description">
+        ${escapeHtml(selectedCourse.description)}
+        </p>
+
+        <div class="features">
+
+            <b>
+            এই কোর্সে যা থাকছে
+            </b>
+
+            ${
+                selectedCourse.features
+                .map(
+                    feature=>
+                    `<div class="feature">
+                    ✅ ${escapeHtml(feature)}
+                    </div>`
+                )
+                .join("")
+            }
+
+        </div>
+
+        <button
+        class="main-btn"
+        onclick="openPayment()"
+        >
+        🛒 Buy Now — ৳${selectedCourse.price}
+        </button>
+
+    </div>
+
+    `;
+
+
+    showPage("detailsPage");
+
+}
+
+
+/* =====================================================
+   PAYMENT PAGE
+===================================================== */
+
+function openPayment(){
+
+    selectedPayment=null;
+
+
+    document.getElementById(
+        "paymentContent"
+    ).innerHTML = `
+
+    <div class="payment-box">
+
+        <b>
+        ${escapeHtml(selectedCourse.title)}
+        </b>
+
+        <div
+        style="
+        color:#229ed9;
+        font-weight:bold;
+        margin-top:7px
+        "
+        >
+        ৳${selectedCourse.price}
+        </div>
+
+    </div>
+
+
+    <div class="payment-box">
+
+        <b>
+        Payment Method নির্বাচন করুন
+        </b>
+
+        <div class="payment-methods">
+
+            <button
+            id="bkashBtn"
+            class="payment-method"
+            onclick="selectPayment('bkash')"
+            >
+            🩷 bKash
+            </button>
+
+            <button
+            id="nagadBtn"
+            class="payment-method"
+            onclick="selectPayment('nagad')"
+            >
+            🟠 Nagad
+            </button>
+
+        </div>
+
+        <div
+        id="paymentNumber"
+        class="payment-number"
+        ></div>
+
+    </div>
+
+
+    <div class="payment-box">
+
+        <label>
+        Transaction ID *
+        </label>
+
+        <input
+        id="transactionId"
+        class="input"
+        placeholder="যেমন: 8F3D7A9K2L"
+        >
+
+        <label>
+        Payment Screenshot *
+        </label>
+
+        <input
+        id="paymentScreenshot"
+        class="input"
+        type="file"
+        accept="image/*"
+        >
+
+        <label>
+        অতিরিক্ত তথ্য
+        </label>
+
+        <textarea
+        id="paymentNote"
+        class="textarea"
+        placeholder="প্রয়োজনে কোনো তথ্য লিখুন..."
+        ></textarea>
+
+        <button
+        class="main-btn"
+        onclick="submitPayment()"
+        >
+        ✅ Payment Submit করুন
+        </button>
+
+        <div class="notice">
+
+        Payment করার পর Transaction ID এবং
+        screenshot অবশ্যই দিন।
+
+        Admin payment যাচাই করার পর আপনার
+        Telegram course link দেওয়া হবে।
+
+        </div>
+
+    </div>
+
+    `;
+
+
+    showPage("paymentPage");
+
+}
+
+
+/* =====================================================
+   PAYMENT METHOD
+===================================================== */
+
+function selectPayment(method){
+
+    selectedPayment=method;
+
+
+    document
+    .querySelectorAll(".payment-method")
+    .forEach(
+        b=>b.classList.remove("selected")
+    );
+
+
+    if(method==="bkash"){
+
+        document
+        .getElementById("bkashBtn")
+        .classList.add("selected");
+
+    }
+
+    else{
+
+        document
+        .getElementById("nagadBtn")
+        .classList.add("selected");
+
+    }
+
+
+    const number =
+    method==="bkash"
+    ?
+    CONFIG.bkashNumber
+    :
+    CONFIG.nagadNumber;
+
+
+    const box =
+    document.getElementById(
+        "paymentNumber"
+    );
+
+
+    box.style.display="block";
+
+
+    box.innerHTML = `
+
+    ${method==="bkash"?"🩷 bKash":"🟠 Nagad"}
+
+    Number:
+
+    <b>${number}</b>
+
+    <button
+    class="copy-btn"
+    onclick="copyText('${number}')"
+    >
+    Copy
+    </button>
+
+    <br><br>
+
+    <small>
+    এই নম্বরে Send Money করুন।
+    </small>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SUBMIT PAYMENT
+===================================================== */
+
+function submitPayment(){
+
+    if(!selectedPayment){
+
+        alert(
+        "প্রথমে bKash অথবা Nagad নির্বাচন করুন।"
+        );
+
+        return;
+
+    }
+
+
+    const transactionId =
+    document
+    .getElementById(
+        "transactionId"
+    )
+    .value
+    .trim();
+
+
+    const screenshot =
+    document
+    .getElementById(
+        "paymentScreenshot"
+    )
+    .files[0];
+
+
+    const note =
+    document
+    .getElementById(
+        "paymentNote"
+    )
+    .value
+    .trim();
+
+
+    if(!transactionId){
+
+        alert(
+        "Transaction ID দিন।"
+        );
+
+        return;
+
+    }
+
+
+    if(!screenshot){
+
+        alert(
+        "Payment screenshot দিন।"
+        );
+
+        return;
+
+    }
+
+
+    const order={
+
+        id:
+        "ORD-"+Date.now(),
+
+        userId:
+        String(telegramUser.id),
+
+        userName:
+        telegramUser.first_name || "",
+
+        username:
+        telegramUser.username || "",
+
+        courseId:
+        selectedCourse.id,
+
+        courseTitle:
+        selectedCourse.title,
+
+        amount:
+        selectedCourse.price,
+
+        paymentMethod:
+        selectedPayment,
+
+        transactionId:
+        transactionId,
+
+        note:
+        note,
+
+        screenshotName:
+        screenshot.name,
+
+        status:
+        "pending",
+
+        courseLink:
+        "",
+
+        createdAt:
+        new Date().toISOString()
+
+    };
+
+
+    const orders =
+    JSON.parse(
+        localStorage.getItem(
+            "courseOrders"
+        ) || "[]"
+    );
+
+
+    orders.unshift(order);
+
+
+    localStorage.setItem(
+        "courseOrders",
+        JSON.stringify(orders)
+    );
+
+
+    alert(
+    "✅ আপনার Payment Submit হয়েছে!\n\nAdmin যাচাই করার পর Course Link দেওয়া হবে।"
+    );
+
+
+    showPage("ordersPage");
+
+    renderOrders();
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+function getOrders(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "courseOrders"
+        ) || "[]"
+    );
+
+}
+
+
+function renderOrders(){
+
+    const orders =
+    getOrders().filter(
+        o =>
+        String(o.userId)
+        ===
+        String(telegramUser.id)
+    );
+
+
+    const container =
+    document.getElementById(
+        "ordersContent"
+    );
+
+
+    if(!orders.length){
+
+        container.innerHTML=
+        `<div class="empty">
+        🛍️<br><br>
+        এখনো কোনো Order নেই।
+        </div>`;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+    orders.map(
+        order=>`
+
+        <div class="order">
+
+            <span
+            class="status
+            ${order.status}"
+            >
+            ${
+                order.status==="approved"
+                ?
+                "Approved"
+                :
+                order.status==="rejected"
+                ?
+                "Rejected"
+                :
+                "Pending"
+            }
+            </span>
+
+            <div class="order-title">
+            ${escapeHtml(order.courseTitle)}
+            </div>
+
+            <div class="order-info">
+
+            Order ID:
+            ${order.id}
+
+            <br>
+
+            Amount:
+            ৳${order.amount}
+
+            <br>
+
+            Payment:
+            ${order.paymentMethod}
+
+            <br>
+
+            Transaction:
+            ${order.transactionId}
+
+            </div>
+
+            ${
+                order.status==="approved"
+                &&
+                order.courseLink
+                ?
+
+                `<a
+                class="course-link"
+                href="${order.courseLink}"
+                target="_blank"
+                >
+                🔗 Telegram Course Group খুলুন
+                </a>`
+
+                :
+
+                order.status==="rejected"
+
+                ?
+
+                `<div
+                style="
+                color:#c53030;
+                font-size:10px;
+                margin-top:10px
+                "
+                >
+                ❌ Payment rejected
+                </div>`
+
+                :
+
+                `<div
+                style="
+                color:#b77900;
+                font-size:10px;
+                margin-top:10px
+                "
+                >
+                ⏳ Admin payment যাচাই করছেন...
+                </div>`
+            }
+
+        </div>
+
+        `
+    ).join("");
+
+}
+
+
+/* =====================================================
+   ADMIN
+===================================================== */
+
+function adminLogin(){
+
+    const password =
+    document
+    .getElementById(
+        "adminPassword"
+    )
+    .value;
+
+
+    if(
+        password
+        ===
+        CONFIG.adminPassword
+    ){
+
+        document
+        .getElementById(
+            "adminLogin"
+        )
+        .style.display="none";
+
+
+        document
+        .getElementById(
+            "adminPanel"
+        )
+        .style.display="block";
+
+
+        renderAdminStats();
+
+        renderAdminOrders();
+
+    }
+
+    else{
+
+        document
+        .getElementById(
+            "adminError"
+        )
+        .textContent=
+        "ভুল password!";
+
+    }
+
+}
+
+
+/* =====================================================
+   ADMIN STATS
+===================================================== */
+
+function renderAdminStats(){
+
+    const orders =
+    getOrders();
+
+
+    const users =
+    new Set(
+        orders.map(
+            o=>o.userId
+        )
+    ).size;
+
+
+    const pending =
+    orders.filter(
+        o=>o.status==="pending"
+    ).length;
+
+
+    const revenue =
+    orders
+    .filter(
+        o=>o.status==="approved"
+    )
+    .reduce(
+        (sum,o)=>
+        sum+Number(o.amount),
+        0
+    );
+
+
+    document.getElementById(
+        "totalUsers"
+    ).textContent=users;
+
+
+    document.getElementById(
+        "totalCourses"
+    ).textContent=courses.length;
+
+
+    document.getElementById(
+        "pendingOrders"
+    ).textContent=pending;
+
+
+    document.getElementById(
+        "totalRevenue"
+    ).textContent=
+    "৳"+
+    revenue.toLocaleString();
+
+}
+
+
+/* =====================================================
+   ADMIN ORDERS
+===================================================== */
+
+function renderAdminOrders(){
+
+    const orders =
+    getOrders();
+
+
+    const q =
+    (
+        document
+        .getElementById(
+            "adminSearch"
+        )
+        ?.value
+        ||
+        ""
+    ).toLowerCase();
+
+
+    const status =
+    document
+    .getElementById(
+        "adminStatus"
+    )
+    ?.value
+    ||
+    "all";
+
+
+    const filtered =
+    orders.filter(
+        order =>
+
+        (
+            status==="all"
+            ||
+            order.status===status
+        )
+
+        &&
+
+        JSON
+        .stringify(order)
+        .toLowerCase()
+        .includes(q)
+
+    );
+
+
+    const table =
+    document.getElementById(
+        "adminOrdersTable"
+    );
+
+
+    table.innerHTML =
+    filtered.map(
+        order=>`
+
+        <tr>
+
+            <td>
+            ${order.id}
+            </td>
+
+            <td>
+            ${escapeHtml(order.userName)}
+            <br>
+            @${escapeHtml(order.username)}
+            <br>
+            ID: ${order.userId}
+            </td>
+
+            <td>
+            ${escapeHtml(order.courseTitle)}
+            <br>
+            ৳${order.amount}
+            </td>
+
+            <td>
+            ${order.paymentMethod}
+            <br>
+            ${order.transactionId}
+            </td>
+
+            <td>
+            <span style="color:#718096">
+            ${order.screenshotName || "Uploaded"}
+            </span>
+            </td>
+
+            <td>
+            ${order.status}
+            </td>
+
+            <td>
+            ${
+                order.courseLink
+                ?
+                `<a
+                href="${order.courseLink}"
+                target="_blank"
+                >
+                Open
+                </a>`
+                :
+                "-"
+            }
+            </td>
+
+            <td>
+
+            ${
+                order.status==="pending"
+                ?
+
+                `
+
+                <button
+                class="admin-btn green"
+                onclick="approveOrder('${order.id}')"
+                >
+                Approve
+                </button>
+
+                <button
+                class="admin-btn red"
+                onclick="rejectOrder('${order.id}')"
+                >
+                Reject
+                </button>
+
+                `
+
+                :
+
+                "-"
+
+            }
+
+            </td>
+
+        </tr>
+
+        `
+    ).join("");
+
+}
+
+
+/* =====================================================
+   APPROVE
+===================================================== */
+
+function approveOrder(orderId){
+
+    const link =
+    prompt(
+    "Telegram Course Group/Channel Link দিন:"
+    );
+
+
+    if(!link)
+    return;
+
+
+    const orders =
+    getOrders();
+
+
+    const order =
+    orders.find(
+        o=>o.id===orderId
+    );
+
+
+    if(!order)
+    return;
+
+
+    order.status="approved";
+
+    order.courseLink=link;
+
+    order.approvedAt=
+    new Date().toISOString();
+
+
+    localStorage.setItem(
+        "courseOrders",
+        JSON.stringify(orders)
+    );
+
+
+    alert(
+    "✅ Order Approved!"
+    );
+
+
+    renderAdminStats();
+
+    renderAdminOrders();
+
+}
+
+
+/* =====================================================
+   REJECT
+===================================================== */
+
+function rejectOrder(orderId){
+
+    const reason =
+    prompt(
+    "Reject করার কারণ:",
+    "Payment verification failed"
+    );
+
+
+    const orders =
+    getOrders();
+
+
+    const order =
+    orders.find(
+        o=>o.id===orderId
+    );
+
+
+    if(!order)
+    return;
+
+
+    order.status="rejected";
+
+    order.rejectReason=
+    reason || "";
+
+
+    localStorage.setItem(
+        "courseOrders",
+        JSON.stringify(orders)
+    );
+
+
+    renderAdminStats();
+
+    renderAdminOrders();
+
+}
+
+
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
+
+function showPage(pageId){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(
+        p=>p.classList.remove("active")
+    );
+
+
+    document
+    .getElementById(pageId)
+    .classList.add("active");
+
+
+    document
+    .querySelectorAll(".nav-btn")
+    .forEach(
+        b=>b.classList.remove("active")
+    );
+
+
+    if(pageId==="homePage")
+    document
+    .getElementById("navHome")
+    .classList.add("active");
+
+
+    if(pageId==="ordersPage")
+    document
+    .getElementById("navOrders")
+    .classList.add("active");
+
+
+    if(pageId==="profilePage")
+    document
+    .getElementById("navProfile")
+    .classList.add("active");
+
+
+    window.scrollTo(0,0);
+
+}
+
+
+/* =====================================================
+   COPY
+===================================================== */
+
+function copyText(text){
+
+    navigator
+    .clipboard
+    ?.writeText(text);
+
+    alert(
+    "Number copied!"
+    );
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+    .replace(
+        /[&<>"']/g,
+        function(char){
+
+            return {
+
+                "&":"&amp;",
+                "<":"&lt;",
+                ">":"&gt;",
+                '"':"&quot;",
+                "'":"&#039;"
+
+            }[char];
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+setupUser();
+
+renderCategories();
+
+renderCourses();
 
 </script>
 
